@@ -17,7 +17,7 @@ namespace LastDayInKhuMuang
         private int stdSpeed;
         private int hp;
         private int action;
-
+        
         private Vector2 playerPos;
 
         private bool idle = true;
