@@ -17,11 +17,13 @@ namespace LastDayInKhuMuang
         private int stdSpeed;
         private int hp;
         private int action;
-        
+
         private Vector2 playerPos;
 
+        Rectangle attackBox = new Rectangle();
+
         private bool idle = true;
-        private bool dashCooldown = false;
+        private bool attack = false;
 
         private float elapsed;
 
@@ -40,43 +42,53 @@ namespace LastDayInKhuMuang
         {
             this.elapsed = elapsed;
         }
-        public void PlayerMove(KeyboardState ks, GraphicsDeviceManager gp, AnimatedTexture animate)
+        public void SetAction(int action)
+        {
+            this.action = action;
+        }
+        public void PlayerMove(KeyboardState ks, GraphicsDeviceManager gp, AnimatedTexture animate, GameTime gametime)
         {
             ks = Keyboard.GetState();
             animate.UpdateFrame(elapsed);
-            if (ks.IsKeyDown(Keys.A))
+            if (ks.IsKeyDown(Keys.A) && !attack)
             {             
                 playerPos.X -= speed;
                 idle = false;
                 action = 2;
             }
-            if (ks.IsKeyDown(Keys.D))
+            if (ks.IsKeyDown(Keys.D) && !attack)
             {
                 playerPos.X += speed;
                 idle = false;
                 action = 3;
             }
-            if (ks.IsKeyDown(Keys.W))
+            if (ks.IsKeyDown(Keys.W) && !attack)
             {
                 playerPos.Y -= speed;
                 idle = false;
                 action = 4;
             }
-            if (ks.IsKeyDown(Keys.S))
+            if (ks.IsKeyDown(Keys.S) && !attack)
             {
                 playerPos.Y += speed;
                 idle = false;
                 action = 1;
             }
-            
+            PlayerAttack(ks);
+            //if (ks.IsKeyDown(Keys.J) && action == 2 && !attack) //Left Attack
+            //{
+            //   // attackBox = new Rectangle((int)playerPos.X - playerWidth, (int)playerPos.Y, playerWidth, playerHeight);
+            //    attack = true;
+            //}
+            //if (ks.IsKeyUp(Keys.J))
+            //{
+            //    attack = false;
+            //}
+
             if (ks.IsKeyUp(Keys.A) && ks.IsKeyUp(Keys.D) && ks.IsKeyUp(Keys.W) && ks.IsKeyUp(Keys.S))
             {
                 idle = true;
             }
-            //if (ks.IsKeyUp(Keys.LeftShift))
-            //{
-            //    speed = stdSpeed;
-            //}
             //Check Collision With Game Screen
             if (playerPos.X > gp.GraphicsDevice.Viewport.Width - playerWidth) 
             {
@@ -95,12 +107,47 @@ namespace LastDayInKhuMuang
                 playerPos.Y += speed;
             }
         }
-        
+        public void PlayerAttack(KeyboardState ks)
+        {
+           //KeyboardState oldKs;
+            
+            if (ks.IsKeyDown(Keys.J) && action == 2 && !attack) //Left Attack
+            {
+                attackBox = new Rectangle((int)playerPos.X - playerWidth, (int)playerPos.Y, playerWidth, playerHeight);
+                attack = true;
+            }
+            else if (ks.IsKeyDown(Keys.J) && action == 3 && !attack) // Right
+            {
+                attackBox = new Rectangle((int)playerPos.X + playerWidth, (int)playerPos.Y, playerWidth, playerHeight);
+                attack = true;
+            }
+            else if (ks.IsKeyDown(Keys.J) && action == 4 && !attack) //Up
+            {
+                attackBox = new Rectangle((int)playerPos.X - ((playerHeight-playerWidth)/2), (int)playerPos.Y - playerWidth, playerHeight, playerWidth);
+                attack = true;
+            }
+            else if (ks.IsKeyDown(Keys.J) && action == 1 && !attack) //Down
+            {
+                attackBox = new Rectangle((int)playerPos.X - ((playerHeight - playerWidth) / 2), (int)playerPos.Y + playerHeight, playerHeight, playerWidth);
+                attack = true;
+            }
+            if (ks.IsKeyUp(Keys.J))
+            {
+                attack = false;
+            }
+        }
+        public bool AttackCollision(Rectangle enemy)
+        {
+            return attackBox.Intersects(enemy);
+        }
+        public bool GetPlayerAtack()
+        {
+            return attack;
+        }
         public Vector2 GetPlayerPos()
         {
             return playerPos;
         }
-
         public bool GetIdle()
         {
             return idle;

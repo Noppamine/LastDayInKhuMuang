@@ -14,7 +14,7 @@ namespace LastDayInKhuMuang
 
         //Player
         private int hp = 100;
-        private int speed = 4;
+        private int speed = 3;
         private int boostSpeed = 5;
         private Vector2 playerPos = new Vector2(200, 200);
         Player player;
@@ -27,6 +27,9 @@ namespace LastDayInKhuMuang
         private const int Frames = 4;
         private const int FramesPerSec = 12;
         private const int FramesRow = 4;
+
+        //Enemy
+        Texture2D ball;
 
         //Font
         private SpriteFont text;
@@ -60,6 +63,10 @@ namespace LastDayInKhuMuang
             //Load Player Content
             player = new Player(speed, boostSpeed, hp, playerPos);
             playerAnimate.Load(Content, "Char01", Frames, FramesRow, FramesPerSec);
+            player.SetAction(1);
+
+            //Load Enemy Content
+            ball = Content.Load<Texture2D>("ball");
 
             //Font
             text = Content.Load<SpriteFont>("Test");
@@ -70,28 +77,43 @@ namespace LastDayInKhuMuang
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            player.PlayerMove(ks, _graphics, playerAnimate);
+            //Player            
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             getElapsed = elapsed;
             player.SetElapsed(elapsed);
+            player.PlayerMove(ks, _graphics, playerAnimate, gameTime);
             playerPos = player.GetPlayerPos();
+            
+
             base.Update(gameTime);
         }
-
+        Rectangle ballRectangle = new Rectangle(250, 250, 24, 24);
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            if (player.GetPlayerAtack() && player.AttackCollision(ballRectangle))
+            {
+                GraphicsDevice.Clear(Color.Red);
+            }
+            else
+            {
+                GraphicsDevice.Clear(Color.CornflowerBlue);
+            }
+            
 
 
             _spriteBatch.Begin();
+
+
             if (!player.GetIdle())
             {
                 playerAnimate.DrawFrame(_spriteBatch, playerPos, player.GetAction());
             }
-            else
+            else if (player.GetIdle())
             {
                 playerAnimate.DrawFrame(_spriteBatch, 0, playerPos, player.GetAction());
             }
+
+            _spriteBatch.Draw(ball, new Vector2(250, 250), new Rectangle(0, 0, 24, 24), Color.White);
             //_spriteBatch.DrawString(text, "" + getElapsed, new Vector2(400,0), Color.Black);
             _spriteBatch.End();
 
