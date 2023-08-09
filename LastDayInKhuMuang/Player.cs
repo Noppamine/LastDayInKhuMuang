@@ -24,6 +24,7 @@ namespace LastDayInKhuMuang
         private bool idle = true;
         private bool dashCooldown = false;
         private bool swordwave = false;
+        private bool ult = false;
         private float elapsed;
 
 
@@ -83,6 +84,10 @@ namespace LastDayInKhuMuang
             //if (ks.IsKeyDown(Keys.E))
             //{
             //    swordwave = true;
+            //}
+            //if (ks.IsKeyDown(Keys.Q) && stamina = 3)
+            //{
+            //    ult = true;
             //}
 
             //Check Collision With Game Screen
