@@ -16,6 +16,7 @@ namespace LastDayInKhuMuang
         private int hp = 100;
         private int speed = 3;
         private int boostSpeed = 5;
+        private int stamina = 3;
         private Vector2 playerPos = new Vector2(200, 200);
         Player player;
 
@@ -61,7 +62,7 @@ namespace LastDayInKhuMuang
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             //Load Player Content
-            player = new Player(speed, boostSpeed, hp, playerPos);
+            player = new Player(speed, boostSpeed, hp, stamina, playerPos);
             playerAnimate.Load(Content, "Char01", Frames, FramesRow, FramesPerSec);
             player.SetAction(1);
 
@@ -103,7 +104,6 @@ namespace LastDayInKhuMuang
 
             _spriteBatch.Begin();
 
-
             if (!player.GetIdle())
             {
                 playerAnimate.DrawFrame(_spriteBatch, playerPos, player.GetAction());
@@ -114,7 +114,7 @@ namespace LastDayInKhuMuang
             }
 
             _spriteBatch.Draw(ball, new Vector2(250, 250), new Rectangle(0, 0, 24, 24), Color.White);
-            //_spriteBatch.DrawString(text, "" + getElapsed, new Vector2(400,0), Color.Black);
+
             _spriteBatch.End();
 
             base.Draw(gameTime);

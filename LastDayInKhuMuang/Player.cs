@@ -17,26 +17,30 @@ namespace LastDayInKhuMuang
         private int stdSpeed;
         private int hp;
         private int action;
-
+        private int stamina;
+        
         private Vector2 playerPos;
 
         Rectangle attackBox = new Rectangle();
 
         private bool idle = true;
-        private bool attack = false;
+        private bool dashCooldown = false;
+
+        private bool attack;
 
         private float elapsed;
 
 
         private int playerWidth = 30;
         private int playerHeight = 45;
-        public Player(int speed, int boost,  int hp, Vector2 position)
+        public Player(int speed, int boost,  int hp, int stamina, Vector2 position)
         {
             this.speed = speed;
             stdSpeed = speed;
             this.hp = hp;
             speedBoost = boost;
             playerPos = position;
+            this.stamina = stamina;
         }
         public void SetElapsed(float elapsed)
         {
@@ -89,6 +93,10 @@ namespace LastDayInKhuMuang
             {
                 idle = true;
             }
+            //if (ks.IsKeyUp(Keys.LeftShift))
+            //{
+            //    speed = stdSpeed;
+            //}
             //Check Collision With Game Screen
             if (playerPos.X > gp.GraphicsDevice.Viewport.Width - playerWidth) 
             {
