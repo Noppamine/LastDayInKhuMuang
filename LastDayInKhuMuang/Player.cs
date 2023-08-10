@@ -18,6 +18,9 @@ namespace LastDayInKhuMuang
         private int hp;
         private int action;
         private int stamina;
+        private int dashRange;
+
+        private string Direction;
         
         private Vector2 playerPos;
 
@@ -42,6 +45,8 @@ namespace LastDayInKhuMuang
             speedBoost = boost;
             playerPos = position;
             this.stamina = stamina;
+            Direction = "Idle";
+            dashRange = 80;
         }
         public void SetElapsed(float elapsed)
         {
@@ -64,29 +69,49 @@ namespace LastDayInKhuMuang
                     playerPos.X -= speed;
                     idle = false;
                     action = 2;
+                    Direction = "Left";
                 }
                 if (ks.IsKeyDown(Keys.D) && !attack)
                 {
                     playerPos.X += speed;
                     idle = false;
                     action = 3;
+                    Direction = "Right";
                 }
                 if (ks.IsKeyDown(Keys.W) && !attack)
                 {
                     playerPos.Y -= speed;
                     idle = false;
                     action = 4;
+                    Direction = "Up";
                 }
                 if (ks.IsKeyDown(Keys.S) && !attack)
                 {
                     playerPos.Y += speed;
                     idle = false;
                     action = 1;
+                    Direction = "Down";
+                }
+                if (ks.IsKeyDown(Keys.W) && ks.IsKeyDown(Keys.A))
+                {
+                    Direction = "Top-Left";
+                }
+                if (ks.IsKeyDown(Keys.W) && ks.IsKeyDown(Keys.D))
+                {
+                    Direction = "Top-Right";
+                }
+                if (ks.IsKeyDown(Keys.S) && ks.IsKeyDown(Keys.A))
+                {
+                    Direction = "Down-Left";
+                }
+                if (ks.IsKeyDown(Keys.S) && ks.IsKeyDown(Keys.D))
+                {
+                    Direction = "Down-Right";
                 }
             }
             if (dashCooldown)
             {
-                CoolDown(gametime);
+                DashCoolDown(gametime);
             }
             
             PlayerAttack(ks);
@@ -115,9 +140,51 @@ namespace LastDayInKhuMuang
         //Player Dash ability
         public void PlayerDash(KeyboardState ks)
         {
-            if (ks.IsKeyDown(Keys.LeftShift) && action == 2 && !dashCooldown && !dash)
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Left" && !dashCooldown && !dash) /*left*/
             {
-                playerPos = new Vector2(playerPos.X - 60, playerPos.Y);
+                playerPos = new Vector2(playerPos.X - dashRange, playerPos.Y);
+                dash = true;
+                dashCooldown = true;
+            }
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Top-Left" && !dashCooldown && !dash) //Top-Left
+            {
+                playerPos = new Vector2(playerPos.X - dashRange, playerPos.Y - dashRange);
+                dash = true;
+                dashCooldown = true;
+            }
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Down-Left" && !dashCooldown && !dash) //Top-Left
+            {
+                playerPos = new Vector2(playerPos.X - dashRange, playerPos.Y + dashRange);
+                dash = true;
+                dashCooldown = true;
+            }
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Right" && !dashCooldown && !dash) // right
+            {
+                playerPos = new Vector2(playerPos.X + dashRange, playerPos.Y);
+                dash = true;
+                dashCooldown = true;
+            }
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Top-Right" && !dashCooldown && !dash) //Top-Left
+            {
+                playerPos = new Vector2(playerPos.X + dashRange, playerPos.Y - dashRange);
+                dash = true;
+                dashCooldown = true;
+            }
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Down-Right" && !dashCooldown && !dash) //Top-Left
+            {
+                playerPos = new Vector2(playerPos.X + dashRange, playerPos.Y + dashRange);
+                dash = true;
+                dashCooldown = true;
+            }
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Down" && !dashCooldown && !dash) // down
+            {
+                playerPos = new Vector2(playerPos.X, playerPos.Y + dashRange);
+                dash = true;
+                dashCooldown = true;
+            }
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Up" && !dashCooldown && !dash) //top
+            {
+                playerPos = new Vector2(playerPos.X, playerPos.Y - dashRange);
                 dash = true;
                 dashCooldown = true;
             }
@@ -126,7 +193,7 @@ namespace LastDayInKhuMuang
                 dash = false;
             }
         }
-        public void CoolDown(GameTime gametime)
+        public void DashCoolDown(GameTime gametime)
         {
             //temp = 0;
             temp += (float)gametime.ElapsedGameTime.TotalMilliseconds / 1000;
