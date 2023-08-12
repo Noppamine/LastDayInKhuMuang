@@ -17,33 +17,41 @@ namespace LastDayInKhuMuang
         private int stdSpeed;
         private int hp;
         private int action;
-        private int stamina;
+        private int stamina = 3;
         private int dashRange;
 
         private string Direction;
         
         private Vector2 playerPos;
+        private Vector2 skillPos;
+        private Vector2 skillspeed = new Vector2(10,10);
 
         Rectangle attackBox = new Rectangle();
+        Rectangle skillBox = new Rectangle();
 
         private bool idle = true;
         private bool dashCooldown = false;
         private bool dash = false;
         private bool attack;
+        private bool skillpress = false;
+        private bool Skill = false;
+        private bool skilltime = false;
 
         private float elapsed;
         private float temp;
+        private float skilltimer;
 
 
         private int playerWidth = 30;
         private int playerHeight = 45;
-        public Player(int speed, int boost,  int hp, int stamina, Vector2 position)
+        public Player(int speed, int boost,  int hp, int stamina, Vector2 position , Vector2 skillposition)
         {
             this.speed = speed;
             stdSpeed = speed;
             this.hp = hp;
             speedBoost = boost;
             playerPos = position;
+            skillPos = skillposition;
             this.stamina = stamina;
             Direction = "Idle";
             dashRange = 80;
@@ -64,28 +72,28 @@ namespace LastDayInKhuMuang
             PlayerDash(ks);
             if (!dash)
             {
-                if (ks.IsKeyDown(Keys.A) && !attack)
+                if (ks.IsKeyDown(Keys.A) && !attack )
                 {
                     playerPos.X -= speed;
                     idle = false;
                     action = 2;
                     Direction = "Left";
                 }
-                if (ks.IsKeyDown(Keys.D) && !attack)
+                if (ks.IsKeyDown(Keys.D) && !attack )
                 {
                     playerPos.X += speed;
                     idle = false;
                     action = 3;
                     Direction = "Right";
                 }
-                if (ks.IsKeyDown(Keys.W) && !attack)
+                if (ks.IsKeyDown(Keys.W) && !attack )
                 {
                     playerPos.Y -= speed;
                     idle = false;
                     action = 4;
                     Direction = "Up";
                 }
-                if (ks.IsKeyDown(Keys.S) && !attack)
+                if (ks.IsKeyDown(Keys.S) && !attack )
                 {
                     playerPos.Y += speed;
                     idle = false;
@@ -119,6 +127,11 @@ namespace LastDayInKhuMuang
             {
                 idle = true;
             }
+            PlayerSkill(ks , gametime);
+            if (ks.IsKeyUp(Keys.A) && ks.IsKeyUp(Keys.D) && ks.IsKeyUp(Keys.W) && ks.IsKeyUp(Keys.S))
+             {
+                idle = true;
+             }
             if (playerPos.X > gp.GraphicsDevice.Viewport.Width - playerWidth) 
             {
                 playerPos.X -= speed;
@@ -134,7 +147,7 @@ namespace LastDayInKhuMuang
             if (playerPos.Y < 0)
             {
                 playerPos.Y += speed;
-            }
+            }     
         }
 
         //Player Dash ability
@@ -152,7 +165,7 @@ namespace LastDayInKhuMuang
                 dash = true;
                 dashCooldown = true;
             }
-            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Down-Left" && !dashCooldown && !dash) //Top-Left
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Down-Left" && !dashCooldown && !dash) //Down-Left
             {
                 playerPos = new Vector2(playerPos.X - dashRange, playerPos.Y + dashRange);
                 dash = true;
@@ -164,13 +177,13 @@ namespace LastDayInKhuMuang
                 dash = true;
                 dashCooldown = true;
             }
-            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Top-Right" && !dashCooldown && !dash) //Top-Left
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Top-Right" && !dashCooldown && !dash) //Top-Right
             {
                 playerPos = new Vector2(playerPos.X + dashRange, playerPos.Y - dashRange);
                 dash = true;
                 dashCooldown = true;
             }
-            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Down-Right" && !dashCooldown && !dash) //Top-Left
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Down-Right" && !dashCooldown && !dash) //Down-Right
             {
                 playerPos = new Vector2(playerPos.X + dashRange, playerPos.Y + dashRange);
                 dash = true;
@@ -182,7 +195,7 @@ namespace LastDayInKhuMuang
                 dash = true;
                 dashCooldown = true;
             }
-            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Up" && !dashCooldown && !dash) //top
+            if (ks.IsKeyDown(Keys.LeftShift) && Direction == "Up" && !dashCooldown && !dash) //up
             {
                 playerPos = new Vector2(playerPos.X, playerPos.Y - dashRange);
                 dash = true;
@@ -208,24 +221,24 @@ namespace LastDayInKhuMuang
 
         public void PlayerAttack(KeyboardState ks)
         {
-           //KeyboardState oldKs;
+           //KeyboardState oldks;
             
             if (ks.IsKeyDown(Keys.J) && action == 2 && !attack) //Left Attack
             {
                 attackBox = new Rectangle((int)playerPos.X - playerWidth, (int)playerPos.Y, playerWidth, playerHeight);
                 attack = true;
             }
-            else if (ks.IsKeyDown(Keys.J) && action == 3 && !attack) // Right
+            else if (ks.IsKeyDown(Keys.J) && action == 3 && !attack) // Right Attack
             {
                 attackBox = new Rectangle((int)playerPos.X + playerWidth, (int)playerPos.Y, playerWidth, playerHeight);
                 attack = true;
             }
-            else if (ks.IsKeyDown(Keys.J) && action == 4 && !attack) //Up
+            else if (ks.IsKeyDown(Keys.J) && action == 4 && !attack) //Up Attack
             {
                 attackBox = new Rectangle((int)playerPos.X - ((playerHeight-playerWidth)/2), (int)playerPos.Y - playerWidth, playerHeight, playerWidth);
                 attack = true;
             }
-            else if (ks.IsKeyDown(Keys.J) && action == 1 && !attack) //Down
+            else if (ks.IsKeyDown(Keys.J) && action == 1 && !attack) //Down Attack
             {
                 attackBox = new Rectangle((int)playerPos.X - ((playerHeight - playerWidth) / 2), (int)playerPos.Y + playerHeight, playerHeight, playerWidth);
                 attack = true;
@@ -234,18 +247,113 @@ namespace LastDayInKhuMuang
             {
                 attack = false;
             }
+            
         }
+        //Player Skill
+        public void PlayerSkill(KeyboardState ks, GameTime gametime)
+        {
+            if (ks.IsKeyDown(Keys.E) && action == 2 && !Skill && stamina == 3) //Left Skill
+            {
+
+                Skill = true;
+                skillpress = true;
+                skilltime = true;
+                stamina = 0;
+                skillPos.X = playerPos.X;
+                skillPos.Y = playerPos.Y+10;
+            }
+            else if (ks.IsKeyDown(Keys.E) && action == 3 && !Skill && stamina == 3) // Right Skill
+            {
+
+                Skill = true;
+                skillpress = true;
+                skilltime = true;
+                stamina = 0;
+                skillPos.X = playerPos.X+8;
+                skillPos.Y = playerPos.Y+10;
+            }
+            else if (ks.IsKeyDown(Keys.E) && action == 4 && !Skill && stamina == 3) //Up Skill
+            {
+
+                Skill = true;
+                skillpress = true;
+                skilltime = true;
+                stamina = 0;
+                skillPos.X = playerPos.X+4;
+                skillPos.Y = playerPos.Y;
+            }
+            else if (ks.IsKeyDown(Keys.E) && action == 1 && !Skill && stamina == 3) //Down Skill
+            {
+
+                Skill = true;
+                skillpress = true;
+                skilltime = true;
+                stamina = 0;
+                skillPos.X = playerPos.X+4;
+                skillPos.Y = playerPos.Y;
+            }
+            if (skilltime)
+            {
+                SkillTime(gametime);
+            }
+            if (skillpress)
+            {
+                SkillPress(gametime);
+            }
+        }
+        //Reset Skillposition
+        public void SkillPress(GameTime gametime)
+        {
+            skilltimer += (float)gametime.ElapsedGameTime.TotalMilliseconds / 1000;
+            if (skilltimer >= 0.2)
+            {
+                skilltimer = 0;
+                skillpress = false;
+                Skill = false;
+                idle = false;
+            }
+        }
+        //SkillTime
+        public void SkillTime(GameTime gametime)
+        {
+            skilltimer += (float)gametime.ElapsedGameTime.TotalMilliseconds / 1000;
+            Console.WriteLine(stamina);
+            if (skilltimer >= 3)
+            {
+                skilltimer = 0;
+                stamina = 3;
+                skilltime = false;
+            }
+
+        }
+
         public bool AttackCollision(Rectangle enemy)
         {
             return attackBox.Intersects(enemy);
+        }
+        public bool SkillCollision(Rectangle enemy)
+        {
+            return skillBox.Intersects(enemy);
         }
         public bool GetPlayerAtack()
         {
             return attack;
         }
+        public bool GetPlayerSkill()
+        {
+            return Skill;
+        }
+        public bool GetSkillTime()
+        {
+            return skilltime;
+        }
         public Vector2 GetPlayerPos()
         {
             return playerPos;
+        }
+        public Vector2 GetSkillPos()
+        {
+            return skillPos;
         }
         public bool GetIdle()
         {

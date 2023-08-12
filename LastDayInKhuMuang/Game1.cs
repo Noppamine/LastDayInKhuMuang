@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace LastDayInKhuMuang
 {
@@ -11,14 +12,20 @@ namespace LastDayInKhuMuang
 
         //Input
         private KeyboardState ks;
+        private KeyboardState oldks;
 
         //Player
         private int hp = 100;
         private int speed = 3;
         private int boostSpeed = 5;
         private int stamina = 3;
+        private int action;
         private Vector2 playerPos = new Vector2(200, 200);
         Player player;
+
+        //Skill
+        private Vector2 skillPos = new Vector2(200, 200);
+        private Vector2 skillspeed = new Vector2(1, 1);
 
         //PlayerAnimation
         private AnimatedTexture playerAnimate;
@@ -62,7 +69,7 @@ namespace LastDayInKhuMuang
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             //Load Player Content
-            player = new Player(speed, boostSpeed, hp, stamina, playerPos);
+            player = new Player(speed, boostSpeed, hp, stamina, playerPos ,skillPos);
             playerAnimate.Load(Content, "Char01", Frames, FramesRow, FramesPerSec);
             player.SetAction(1);
 
@@ -84,14 +91,40 @@ namespace LastDayInKhuMuang
             player.SetElapsed(elapsed);
             player.PlayerMove(ks, _graphics, playerAnimate, gameTime);
             playerPos = player.GetPlayerPos();
-            
+            //Skill Direction Update Time
+            if (player.GetPlayerSkill())
+            {
+                skillPos = player.GetSkillPos();
+                action = player.GetAction();
+            }
+            if (action == 2) // left skill
+            {
+                skillPos.X = skillPos.X - 10;
+            }
+            if (action == 3) // right skill
+            {
+                skillPos.X = skillPos.X + 10;
+            }
+            if (action == 4) // up skill
+            {
+                skillPos.Y = skillPos.Y - 10;
+            }
+            if (action == 1) // down skill
+            {
+                skillPos.Y = skillPos.Y + 10;
+            }
 
             base.Update(gameTime);
         }
         Rectangle ballRectangle = new Rectangle(250, 250, 24, 24);
+        Rectangle skillBox = new Rectangle(0,0, 24, 24);
         protected override void Draw(GameTime gameTime)
         {
             if (player.GetPlayerAtack() && player.AttackCollision(ballRectangle))
+            {
+                GraphicsDevice.Clear(Color.Red);
+            }
+            else if (player.GetSkillTime() && player.SkillCollision(ballRectangle))
             {
                 GraphicsDevice.Clear(Color.Red);
             }
@@ -99,7 +132,7 @@ namespace LastDayInKhuMuang
             {
                 GraphicsDevice.Clear(Color.CornflowerBlue);
             }
-            
+
 
 
             _spriteBatch.Begin();
@@ -112,12 +145,17 @@ namespace LastDayInKhuMuang
             {
                 playerAnimate.DrawFrame(_spriteBatch, 0, playerPos, player.GetAction());
             }
+            //Draw Skill
+            if (player.GetSkillTime())
+            {
+                _spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y),skillBox, Color.White);
+            }
 
             _spriteBatch.Draw(ball, new Vector2(250, 250), new Rectangle(0, 0, 24, 24), Color.White);
 
             _spriteBatch.End();
 
-            base.Draw(gameTime);
+                base.Draw(gameTime);
+            }
         }
-    }
-}
+}   
