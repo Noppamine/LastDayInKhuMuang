@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Tiled.Renderers;
-using System;
 
 namespace LastDayInKhuMuang
 {
@@ -11,14 +8,6 @@ namespace LastDayInKhuMuang
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-       // string version = System.Diagnostics.FileVersionInfo.GetVersionInfo(typeof(Microsoft.Xna.Framework.Game).Assembly.Location).FileVersion;
-
-        ////Map
-        //const int MapHeight = 900;
-        //const int MapWidth = 1600;
-        //TiledMap tiledMap;
-        //TiledMapRenderer tiledMapRenderer;
-
 
         //Input
         private KeyboardState ks;
@@ -54,8 +43,8 @@ namespace LastDayInKhuMuang
             IsMouseVisible = true;
 
             //Set Screen
-            //_graphics.PreferredBackBufferHeight = 900;
-            //_graphics.PreferredBackBufferWidth = 1600;
+            _graphics.PreferredBackBufferHeight = 600;
+            _graphics.PreferredBackBufferWidth = 800;
 
             //Set Sprite
             playerAnimate = new AnimatedTexture(Vector2.Zero, Rotation, Scale, Depth);
@@ -63,9 +52,7 @@ namespace LastDayInKhuMuang
 
         protected override void Initialize()
         {
-            //_graphics.PreferredBackBufferHeight = MapHeight; //Set width of wondow
-            //_graphics.PreferredBackBufferWidth = MapWidth; //Set Height of window
-            //_graphics.ApplyChanges(); //apply setting
+
 
             base.Initialize();
         }
@@ -84,16 +71,13 @@ namespace LastDayInKhuMuang
 
             //Font
             text = Content.Load<SpriteFont>("Test");
-
-            //Load tiledMap
-            //tiledMap = Content.Load<TiledMap>("");
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            //Console.Write("MonogameFrameworkVersion : " + version);
+
             //Player            
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             getElapsed = elapsed;
