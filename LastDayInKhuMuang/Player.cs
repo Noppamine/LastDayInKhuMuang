@@ -318,7 +318,7 @@ namespace LastDayInKhuMuang
         {
             skilltimer += (float)gametime.ElapsedGameTime.TotalMilliseconds / 1000;
             Console.WriteLine(stamina);
-            if (skilltimer >= 3)
+            if (skilltimer >= 2)
             {
                 skilltimer = 0;
                 stamina = 3;

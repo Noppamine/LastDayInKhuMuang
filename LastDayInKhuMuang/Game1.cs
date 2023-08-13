@@ -26,6 +26,7 @@ namespace LastDayInKhuMuang
         //Skill
         private Vector2 skillPos = new Vector2(200, 200);
         private Vector2 skillspeed = new Vector2(1, 1);
+        Rectangle skillBox = new Rectangle();
 
         //PlayerAnimation
         private AnimatedTexture playerAnimate;
@@ -113,18 +114,17 @@ namespace LastDayInKhuMuang
             {
                 skillPos.Y = skillPos.Y + 10;
             }
-
+            skillBox = new Rectangle((int)skillPos.X, (int)skillPos.Y, 24, 24);
             base.Update(gameTime);
         }
         Rectangle ballRectangle = new Rectangle(250, 250, 24, 24);
-        Rectangle skillBox = new Rectangle(0,0, 24, 24);
         protected override void Draw(GameTime gameTime)
         {
             if (player.GetPlayerAtack() && player.AttackCollision(ballRectangle))
             {
                 GraphicsDevice.Clear(Color.Red);
             }
-            else if (player.GetSkillTime() && player.SkillCollision(ballRectangle))
+            else if (player.GetSkillTime() && skillBox.Intersects(ballRectangle))
             {
                 GraphicsDevice.Clear(Color.Red);
             }
@@ -149,6 +149,7 @@ namespace LastDayInKhuMuang
             if (player.GetSkillTime())
             {
                 _spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y),skillBox, Color.White);
+                _spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y) , new Rectangle(0,0,24,24), Color.White);
             }
 
             _spriteBatch.Draw(ball, new Vector2(250, 250), new Rectangle(0, 0, 24, 24), Color.White);
