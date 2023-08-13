@@ -50,8 +50,8 @@ namespace LastDayInKhuMuang
             IsMouseVisible = true;
 
             //Set Screen
-            _graphics.PreferredBackBufferHeight = 600;
-            _graphics.PreferredBackBufferWidth = 800;
+            //_graphics.PreferredBackBufferHeight = 600;
+            //_graphics.PreferredBackBufferWidth = 800;
 
             //Set Sprite
             playerAnimate = new AnimatedTexture(Vector2.Zero, Rotation, Scale, Depth);
