@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
+
 namespace LastDayInKhuMuang
 {
     public class Player
@@ -197,7 +199,7 @@ namespace LastDayInKhuMuang
         {
             //temp = 0;
             temp += (float)gametime.ElapsedGameTime.TotalMilliseconds / 1000;
-            Console.WriteLine(temp);
+            Console.WriteLine("CoolDown Check : " + temp);            
             if (temp >= 3)
             {
                 temp = 0;
