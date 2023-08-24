@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Timers;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
@@ -46,8 +47,8 @@ namespace LastDayInKhuMuang
         private float skilltimer;
 
         //Player size
-        private int playerWidth = 30;
-        private int playerHeight = 45;
+        private int playerWidth = 128;
+        private int playerHeight = 128;
 
         public Player(int speed, int boost,  int hp, int stamina, Vector2 position , Vector2 skillposition)
         {
@@ -75,10 +76,11 @@ namespace LastDayInKhuMuang
             playerPos = Pos;
         }
         //Player move
-        public void PlayerMove(KeyboardState ks, GraphicsDeviceManager gp, AnimatedTexture animate, GameTime gametime)
+        public void PlayerMove(KeyboardState ks, GraphicsDeviceManager gp, AnimatedTexture animate, AnimatedTexture attackanimate, GameTime gametime)
         {
             ks = Keyboard.GetState();
             animate.UpdateFrame(elapsed);
+            attackanimate.UpdateFrame(elapsed);
             PlayerDash(ks);
             if (!dash)
             {
@@ -93,14 +95,14 @@ namespace LastDayInKhuMuang
                 {
                     playerPos.X += speed;
                     idle = false;
-                    action = 3;
+                    action = 1;
                     Direction = "Right";
                 }
                 if (ks.IsKeyDown(Keys.W) && !attack )
                 {
                     playerPos.Y -= speed;
                     idle = false;
-                    action = 4;
+                    action = 1;
                     Direction = "Up";
                 }
                 if (ks.IsKeyDown(Keys.S) && !attack )
@@ -131,8 +133,8 @@ namespace LastDayInKhuMuang
             {
                 DashCoolDown(gametime);
             }
-            
-            PlayerAttack(ks);
+
+            PlayerAttack(ks ,attackanimate);
             if (ks.IsKeyUp(Keys.A) && ks.IsKeyUp(Keys.D) && ks.IsKeyUp(Keys.W) && ks.IsKeyUp(Keys.S))
             {
                 idle = true;
@@ -229,19 +231,21 @@ namespace LastDayInKhuMuang
             
         }
 
-        public void PlayerAttack(KeyboardState ks)
+        public void PlayerAttack(KeyboardState ks , AnimatedTexture attackanimate)
         {
            //KeyboardState oldks;
             
-            if (ks.IsKeyDown(Keys.J) && action == 2 && !attack) //Left Attack
+            if (ks.IsKeyDown(Keys.J) && Direction == "Left" && !attack) //Left Attack
             {
                 attackBox = new Rectangle((int)playerPos.X - playerWidth, (int)playerPos.Y, playerWidth, playerHeight);
                 attack = true;
+                idle = true;
             }
-            else if (ks.IsKeyDown(Keys.J) && action == 3 && !attack) // Right Attack
+            else if (ks.IsKeyDown(Keys.J) && Direction == "Right" && !attack) // Right Attack
             {
                 attackBox = new Rectangle((int)playerPos.X + playerWidth, (int)playerPos.Y, playerWidth, playerHeight);
                 attack = true;
+                idle = true;
             }
             else if (ks.IsKeyDown(Keys.J) && action == 4 && !attack) //Up Attack
             {
@@ -257,10 +261,9 @@ namespace LastDayInKhuMuang
             {
                 attack = false;
             }
-            
         }
-        //Player Skill
-        public void PlayerSkill(KeyboardState ks, GameTime gametime)
+    //Player Skill
+    public void PlayerSkill(KeyboardState ks, GameTime gametime)
         {
             if (ks.IsKeyDown(Keys.E) && action == 2 && !Skill && stamina == 3) //Left Skill
             {
@@ -345,7 +348,7 @@ namespace LastDayInKhuMuang
         {
             return skillBox.Intersects(enemy);
         }
-        public bool GetPlayerAtack()
+        public bool GetPlayerAttack()
         {
             return attack;
         }
@@ -380,6 +383,10 @@ namespace LastDayInKhuMuang
         public Rectangle GetAttackRec()
         {
             return attackBox;
+        }
+        public String GetDirection()
+        {
+            return Direction;
         }
     }
 

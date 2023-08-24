@@ -59,9 +59,18 @@ namespace LastDayInKhuMuang
         private const float Rotation = 0;
         private const float Scale = 1.0f;
         private const float Depth = 0.5f;
-        private const int Frames = 4;
-        private const int FramesPerSec = 12;
+        private const int Frames = 10;
+        private const int FramesPerSec = 36;
         private const int FramesRow = 4;
+
+        //AttackAnimation
+        private AnimatedTexture AttackAnimate;
+        private const float AttackRotation = 0;
+        private const float AttackScale = 1.0f;
+        private const float AttackDepth = 0.5f;
+        private const int AttackFrames = 10;
+        private const int AttackFramesPerSec = 12;
+        private const int AttackFramesRow = 2;
 
         //Enemy
         private Texture2D ball;
@@ -91,7 +100,8 @@ namespace LastDayInKhuMuang
             //collisionComponent = new CollisionComponent(new RectangleF(200, 200, MapWidth, MapHeight));
 
             //Set Sprite
-            playerAnimate = new AnimatedTexture(Vector2.Zero, Rotation, Scale, Depth);            
+            playerAnimate = new AnimatedTexture(Vector2.Zero, Rotation, Scale, Depth);
+            AttackAnimate = new AnimatedTexture(Vector2.Zero, AttackRotation,AttackScale,AttackDepth);
         }
 
         protected override void Initialize()
@@ -115,7 +125,8 @@ namespace LastDayInKhuMuang
 
             //Load Player Content
             player = new Player(speed, boostSpeed, hp, stamina, playerPos, skillPos);
-            playerAnimate.Load(Content, "Resources/Char01", Frames, FramesRow, FramesPerSec);
+            playerAnimate.Load(Content, "Player01", Frames, FramesRow, FramesPerSec);
+            AttackAnimate.Load(Content, "Effect_Attack", AttackFrames, AttackFramesRow, AttackFramesPerSec);
             player.SetAction(1);
             //Setup player
             //entities.Add(new PlayerEntity(this, new RectangleF(new Point2(32, 470), new Size2(56, 56))));
@@ -155,7 +166,7 @@ namespace LastDayInKhuMuang
             //    entity.Update(gameTime);
             //}
             //collisionComponent.Update(gameTime);
-            player.PlayerMove(ks, _graphics, playerAnimate, gameTime);
+            player.PlayerMove(ks, _graphics, playerAnimate,AttackAnimate, gameTime);
             playerPos = player.GetPlayerPos();
             //Skill Direction Update Time
             if (player.GetPlayerSkill())
@@ -167,15 +178,15 @@ namespace LastDayInKhuMuang
             {
                 skillPos.X = skillPos.X - 10;
             }
-            if (action == 3) // right skill
+            if (action == 1) // right skill
             {
                 skillPos.X = skillPos.X + 10;
             }
-            if (action == 4) // up skill
+            if (action == 2) // up skill
             {
                 skillPos.Y = skillPos.Y - 10;
             }
-            if (action == 1) // down skill
+            if (action == 2) // down skill
             {
                 skillPos.Y = skillPos.Y + 10;
             }
@@ -210,7 +221,7 @@ namespace LastDayInKhuMuang
 
         protected override void Draw(GameTime gameTime)
         {
-            if (player.GetPlayerAtack() && player.AttackCollision(ballRectangle))
+            if (player.GetPlayerAttack() && player.AttackCollision(ballRectangle))
             {
                 GraphicsDevice.Clear(Color.Red);
             }
@@ -240,6 +251,15 @@ namespace LastDayInKhuMuang
             }
             else if (player.GetIdle())
             {
+                if (player.GetPlayerAttack() && player.GetDirection() == "Right") // right attack
+                {
+                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
+                }
+                else if (player.GetPlayerAttack() && player.GetDirection() == "Left") // right attack
+                {
+                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 4);
+                }
+                else
                 playerAnimate.DrawFrame(_spriteBatch, 0, playerPos, player.GetAction());
             }
 
@@ -247,11 +267,23 @@ namespace LastDayInKhuMuang
             //Draw Skill
             if (player.GetSkillTime())
             {
-                if (skillPos.X > 0 && skillPos.X < _graphics.GraphicsDevice.Viewport.Width || skillPos.Y > 0 && skillPos.Y < _graphics.GraphicsDevice.Viewport.Width)
+                if (skillPos.X > 0 && skillPos.X < _graphics.GraphicsDevice.Viewport.Width && skillPos.Y > 0 && skillPos.Y < _graphics.GraphicsDevice.Viewport.Width)
                 {
                     _spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y), skillBox, Color.White);
                     _spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y), new Rectangle(0, 0, 24, 24), Color.White);
                 }
+            }
+
+            //Draw AttackAnimate
+            if (player.GetPlayerAttack()&& player.GetDirection() == "Right") // right attack
+            {
+                AttackAnimate.DrawFrame(_spriteBatch,playerPos,1);
+                playerAnimate.DrawFrame(_spriteBatch, playerPos,3);
+            }
+            if (player.GetPlayerAttack() && player.GetDirection() == "Left") // right attack
+            {
+                AttackAnimate.DrawFrame(_spriteBatch, playerPos, 2);
+                playerAnimate.DrawFrame(_spriteBatch, playerPos, 4);
             }
 
             //Draw Scenes
