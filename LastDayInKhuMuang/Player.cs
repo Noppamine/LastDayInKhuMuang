@@ -1,10 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SharpDX.Direct2D1;
+using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +14,8 @@ using System.Threading.Tasks;
 namespace LastDayInKhuMuang
 {
     public class Player
-    {
+    {        
+        //Player valuable
         private int speed;
         private int speedBoost;
         private int stdSpeed;
@@ -43,9 +45,10 @@ namespace LastDayInKhuMuang
         private float temp;
         private float skilltimer;
 
-
+        //Player size
         private int playerWidth = 30;
         private int playerHeight = 45;
+
         public Player(int speed, int boost,  int hp, int stamina, Vector2 position , Vector2 skillposition)
         {
             this.speed = speed;
@@ -58,6 +61,7 @@ namespace LastDayInKhuMuang
             Direction = "Idle";
             dashRange = 80;
         }
+        
         public void SetElapsed(float elapsed)
         {
             this.elapsed = elapsed;
@@ -65,6 +69,10 @@ namespace LastDayInKhuMuang
         public void SetAction(int action)
         {
             this.action = action;
+        }
+        public void SetPosition(Vector2 Pos)
+        {
+            playerPos = Pos;
         }
         //Player move
         public void PlayerMove(KeyboardState ks, GraphicsDeviceManager gp, AnimatedTexture animate, GameTime gametime)
@@ -319,7 +327,7 @@ namespace LastDayInKhuMuang
         public void SkillTime(GameTime gametime)
         {
             skilltimer += (float)gametime.ElapsedGameTime.TotalMilliseconds / 1000;
-            Console.WriteLine(stamina);
+            Console.WriteLine(skilltimer);
             if (skilltimer >= 2)
             {
                 skilltimer = 0;
@@ -364,6 +372,14 @@ namespace LastDayInKhuMuang
         public int GetAction()
         {
             return action;
+        }
+        public int GetPlayerSpeed()
+        {
+            return speed;
+        }
+        public Rectangle GetAttackRec()
+        {
+            return attackBox;
         }
     }
 

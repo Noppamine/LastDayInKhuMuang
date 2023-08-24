@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.VisualBasic.Devices;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,6 +74,10 @@ namespace LastDayInKhuMuang
             //if (fistHitBox.Intersects(player)) //Check collision with player (Not sure to do this way. On the other way go to check at Player.cs)
             //{
             //    //Deal damage
+            //}
+            //if (Keyboard.)
+            //{
+
             //}
         }
 
