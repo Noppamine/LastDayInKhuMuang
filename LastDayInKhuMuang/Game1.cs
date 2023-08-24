@@ -79,7 +79,7 @@ namespace LastDayInKhuMuang
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
 
             //Set Screen
             //_graphics.PreferredBackBufferWidth = MapWidth;
@@ -96,12 +96,12 @@ namespace LastDayInKhuMuang
 
         protected override void Initialize()
         {
-            _graphics.PreferredBackBufferHeight = MapHeight;
+            _graphics.PreferredBackBufferHeight = MapHeight ;
             _graphics.PreferredBackBufferWidth = MapWidth;
             _graphics.ApplyChanges();
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
-            ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth / zoom, MapHeight / zoom);
+            ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth/zoom, MapHeight/zoom);
             camera = new OrthographicCamera(viewportadpter);
             bgPos = new Vector2(0, 0);
             
@@ -146,6 +146,7 @@ namespace LastDayInKhuMuang
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             ms = Mouse.GetState();
+
             //Player            
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             getElapsed = elapsed;
@@ -191,11 +192,13 @@ namespace LastDayInKhuMuang
             }
             else if (changeScenes.GetScenes() == 2)
             {
-                boss2.BossUpdate();
+                boss2.BossUpdate(player.GetPlayerPos(), gameTime);
                 //player.SetPosition(new Vector2(200,200));
                 ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth, MapHeight);
                 camera = new OrthographicCamera(viewportadpter);
-                camera.LookAt(bgPos + new Vector2(MapWidth/2, MapHeight/2));
+                camera.LookAt(bgPos + new Vector2(MapWidth / 2, MapHeight / 2));
+                //camera.LookAt(bgPos + new Vector2(MapWidth / 2, MapHeight / 2));
+                UpdateCamera();
             }
             
 
@@ -247,7 +250,7 @@ namespace LastDayInKhuMuang
             //Draw Skill
             if (player.GetSkillTime())
             {
-                if (skillPos.X > 0 && skillPos.X < _graphics.GraphicsDevice.Viewport.Width || skillPos.Y > 0 && skillPos.Y < _graphics.GraphicsDevice.Viewport.Width)
+                if (skillPos.X > 0 && skillPos.X < _graphics.GraphicsDevice.Viewport.Width && skillPos.Y > 0 && skillPos.Y < _graphics.GraphicsDevice.Viewport.Width)
                 {
                     _spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y), skillBox, Color.White);
                     _spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y), new Rectangle(0, 0, 24, 24), Color.White);
