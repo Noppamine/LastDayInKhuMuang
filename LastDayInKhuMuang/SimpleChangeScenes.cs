@@ -11,9 +11,12 @@ namespace LastDayInKhuMuang
 {
     public class SimpleChangeScenes
     {
+        private bool changed;
         int scenes = 1;
         public Game1 game;
         public SpriteBatch spriteBatch;
+
+        private Vector2 playerPos;
         //Scenes
         private Vector2 pos = new Vector2(0,0);
         public Texture2D homeScene;
@@ -21,7 +24,8 @@ namespace LastDayInKhuMuang
         public SimpleChangeScenes(Game1 game, SpriteBatch spriteBatch)
         {
             this.game = game;
-            this.spriteBatch = spriteBatch; 
+            this.spriteBatch = spriteBatch;
+            changed = false;
         }
         public void UpdateScenes(KeyboardState ks)
         {
@@ -29,16 +33,20 @@ namespace LastDayInKhuMuang
             if (ks.IsKeyDown(Keys.F1))
             {
                 scenes = 1;
+                changed = true;
             }
             if (ks.IsKeyDown(Keys.F2))
             {
                 scenes = 2;
+                changed = true;
             }
             if (ks.IsKeyDown(Keys.F3))
             {
                 scenes = 3;
+                changed = true;
             }
-            Console.WriteLine(scenes);
+            //Console.WriteLine(scenes);
+            //Console.WriteLine(changed);
         }
         public void LoadScenes()
         {
@@ -49,7 +57,7 @@ namespace LastDayInKhuMuang
         {
             if (scenes == 1)
             {
-                spriteBatch.Draw(homeScene, pos, null, Color.White, 0f, Vector2.Zero, new Vector2(2.5f, 2.5f), 0, 0);
+                spriteBatch.Draw(homeScene, pos, null, Color.White, 0f, Vector2.Zero, new Vector2(2.5f, 2.5f), 0, 0);                
             }
             else if (scenes == 2)
             {
@@ -60,9 +68,30 @@ namespace LastDayInKhuMuang
                 spriteBatch.Draw(homeScene, pos, null, Color.White, 0f, Vector2.Zero, new Vector2(2.5f, 2.5f), 0, 0);
             }
         }
+        public void SpawnPlayer()
+        {
+            if (changed)
+            {
+                playerPos = new Vector2(200 ,200);
+                changed = false;
+            }
+        }
         public int GetScenes()
         {
             return scenes;
+        }
+        public Vector2 GetPlayerSpawn()
+        {
+            if (changed)
+            {
+                playerPos = new Vector2(200, 200);
+                changed = false;                
+            }
+            return playerPos;
+        }
+        public bool GetChangedScene()
+        {
+            return changed;
         }
     }
 }

@@ -16,21 +16,34 @@ namespace LastDayInKhuMuang
         KeyboardState ks;
         private bool usedThunderBolt;
         private bool usedLightningBeam;
+        private bool readyRandPattern;
 
+        //Bolt
         private bool beamed;
         private Texture2D damageThunderboltArea;
+        private Color[] dataBolt;
+        private Texture2D thunderBolt;
+        private Vector2 thunderBoltPos;
+        private float thunderCooldown;
+
+        //Beam
         private Vector2 lightningBeamPos;
         private Color[] dataBeam;
         private Texture2D damageLightningBeamArea;
         private float beamCooldown;
         private float delayBeam;
 
-        private Color[] dataBolt;
-        private Texture2D thunderBolt;
-        private Vector2 thunderBoltPos;
-        private float thunderCooldown;
+        //Rod
+        private Texture2D damgeLightningRod;
+        private Vector2 lightningRod;
+        private Color[] dataRod;
+        private Rectangle dangArea;
+        private float shockEffect;
+        private float rodCooldown;
 
-        
+
+        private float bossTime;
+
         private Texture2D boss2Texture;
         SpriteBatch spriteBatch;
         Game1 game;
@@ -62,6 +75,7 @@ namespace LastDayInKhuMuang
             dataBeam = new Color[1690*60];
             usedThunderBolt = false;
             usedLightningBeam = false;
+            readyRandPattern = true;
             for (int i=0; i < dataBolt.Length; i++)
             {
                 dataBolt[i] = Color.LightPink;
@@ -76,6 +90,7 @@ namespace LastDayInKhuMuang
         public void BossUpdate(Vector2 playerPos, GameTime gameTime)
         {
             //AttackPattern();
+            AttackPattern(gameTime);
             if (!usedLightningBeam && !usedThunderBolt)
             {
                 this.playerPos = playerPos;
@@ -85,7 +100,7 @@ namespace LastDayInKhuMuang
             {                
                 lightningBeamPos = new Vector2(0, playerPos.Y);
             }
-            else if (usedLightningBeam)
+            else if (usedLightningBeam && beamed)
             {
                 lightningBeamPos = new Vector2(0, this.playerPos.Y);
             }
@@ -103,7 +118,7 @@ namespace LastDayInKhuMuang
             ks = Keyboard.GetState();
             ThunderBolt(gameTime);
             LightningBeam(gameTime);
-            Console.WriteLine("BossThnderbolt : " + usedThunderBolt);
+            Console.WriteLine("BossTime : "+bossTime);
         }
 
         public void BossDraw()
@@ -120,19 +135,37 @@ namespace LastDayInKhuMuang
             }
         }
 
+        //Start attack
         public void AttackPattern(GameTime gameTime)
         {
-            int action;
-            action = rand.Next(2);
-            switch (action)
+            if (readyRandPattern && !usedThunderBolt && !usedLightningBeam)
             {
-                case 1:
-                    ThunderBolt(gameTime);
-                    break;
-                case 2:
-                    LightningBeam(gameTime);
-                    break;
+                bossTime += (float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000;
+                int action;
+                if (bossTime > 3 )
+                {
+                    action = rand.Next(0, 3);
+                    switch (action)
+                    {
+                        case 1:
+                            usedThunderBolt = true;
+                            ThunderBolt(gameTime);
+                            break;
+                        case 2:
+                            usedLightningBeam = true;
+                            LightningBeam(gameTime);
+                            break;
+                    }
+                }                
             }
+            else if (!readyRandPattern || usedLightningBeam || usedThunderBolt)
+            {
+                bossTime = 0;
+            }
+            //else if (!readyRandPattern)
+            //{
+            //    bossTime = 0;
+            //}            
         }
         public async void ThunderBolt(GameTime time)
         {
@@ -144,22 +177,25 @@ namespace LastDayInKhuMuang
             {
                 thunderCooldown = 0;
             }
-            if (ks.IsKeyDown(Keys.NumPad1) && !usedThunderBolt)
-            {
-                usedThunderBolt = true;
-            }
-            if (thunderCooldown >= 4)
+            //attack
+            //if (ks.IsKeyDown(Keys.NumPad1) && !usedThunderBolt)
+            //{
+            //    usedThunderBolt = true;
+            //}
+            if (thunderCooldown >= 3)
             {
                 usedThunderBolt = false;
+                readyRandPattern = true;
             }
-
         }
         public void LightningBeam(GameTime time)
         {
-            if (ks.IsKeyDown(Keys.NumPad2) && !usedLightningBeam)
-            {
-                usedLightningBeam = true;
-            }
+            //attack
+            //if (ks.IsKeyDown(Keys.NumPad2) && !usedLightningBeam)
+            //{
+            //    usedLightningBeam = true;
+            //}
+
             if (!usedLightningBeam)
             {
                 delayBeam = 0;
@@ -193,11 +229,12 @@ namespace LastDayInKhuMuang
             if (beamCooldown >= 3)
             {
                 usedLightningBeam = false;
+                readyRandPattern = true;
             }
         }
         public void LightningRod()
         {
-
+                
         }
     }
 }
