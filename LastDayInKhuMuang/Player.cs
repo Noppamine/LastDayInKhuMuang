@@ -222,7 +222,7 @@ namespace LastDayInKhuMuang
         {
             //temp = 0;
             temp += (float)gametime.ElapsedGameTime.TotalMilliseconds / 1000;
-            Console.WriteLine("CoolDown Check : " + temp);            
+            //Console.WriteLine("CoolDown Check : " + temp);            
             if (temp >= 3)
             {
                 temp = 0;
@@ -330,7 +330,7 @@ namespace LastDayInKhuMuang
         public void SkillTime(GameTime gametime)
         {
             skilltimer += (float)gametime.ElapsedGameTime.TotalMilliseconds / 1000;
-            Console.WriteLine(skilltimer);
+            //Console.WriteLine(skilltimer);
             if (skilltimer >= 2)
             {
                 skilltimer = 0;

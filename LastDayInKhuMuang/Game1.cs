@@ -60,7 +60,7 @@ namespace LastDayInKhuMuang
         private const float Scale = 1.0f;
         private const float Depth = 0.5f;
         private const int Frames = 10;
-        private const int FramesPerSec = 36;
+        private const int FramesPerSec = 12;
         private const int FramesRow = 4;
 
         //AttackAnimation
@@ -194,8 +194,20 @@ namespace LastDayInKhuMuang
             skillBox = new Rectangle((int)skillPos.X, (int)skillPos.Y, 24, 24);
 
             //Camera
+            if (ks.IsKeyDown(Keys.F11) && _graphics.IsFullScreen == false)
+            {
+                _graphics.IsFullScreen = true;                
+            }
+            else if (ks.IsKeyDown(Keys.F11) && _graphics.IsFullScreen == true)
+            {
+                _graphics.IsFullScreen = false;
+            }
             if (changeScenes.GetScenes() == 1)
             {
+                if (changeScenes.GetChangedScene())
+                {
+                    player.SetPosition(changeScenes.GetPlayerSpawn());
+                }
                 ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth / zoom, MapHeight / zoom);
                 camera = new OrthographicCamera(viewportadpter);               
                 camera.LookAt(cameraPos);
@@ -203,7 +215,11 @@ namespace LastDayInKhuMuang
             }
             else if (changeScenes.GetScenes() == 2)
             {
-                boss2.BossUpdate(player.GetPlayerPos(), gameTime);
+                if (changeScenes.GetChangedScene())
+                {
+                    player.SetPosition(changeScenes.GetPlayerSpawn());
+                }
+                boss2.BossUpdate(player.GetPlayerPos(), gameTime);                
                 //player.SetPosition(new Vector2(200,200));
                 ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth, MapHeight);
                 camera = new OrthographicCamera(viewportadpter);
@@ -249,11 +265,12 @@ namespace LastDayInKhuMuang
 
             //Draw Player            
             if (!player.GetIdle())
-            {
-                playerAnimate.DrawFrame(_spriteBatch, playerPos, player.GetAction());
+            {               
+                playerAnimate.DrawFrame(_spriteBatch, playerPos, player.GetAction());                
             }
             else if (player.GetIdle())
             {
+                
                 if (player.GetPlayerAttack() && player.GetDirection() == "Right") // right attack
                 {
                     playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
@@ -307,7 +324,7 @@ namespace LastDayInKhuMuang
 
         public void UpdateCamera()
         {
-            cameraPos = player.GetPlayerPos() + new Vector2(15, 22);
+            cameraPos = player.GetPlayerPos() + new Vector2(64, 64);
         }
         public int GetMapWidth()
         {
