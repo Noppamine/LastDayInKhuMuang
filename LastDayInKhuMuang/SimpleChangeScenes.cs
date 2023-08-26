@@ -38,7 +38,7 @@ namespace LastDayInKhuMuang
             {
                 scenes = 3;
             }
-            Console.WriteLine(scenes);
+            //Console.WriteLine(scenes);
         }
         public void LoadScenes()
         {
