@@ -14,7 +14,7 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Boss-Animate-TunderBold-.png
+#begin BossTuderbolt.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -24,7 +24,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Boss-Animate-TunderBold-.png
+/build:BossTuderbolt.png
 
 #begin Effect_Attack.png
 /importer:TextureImporter

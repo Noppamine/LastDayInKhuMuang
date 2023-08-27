@@ -83,6 +83,15 @@ namespace LastDayInKhuMuang
         private const int SkillFramesPerSec = 6;
         private const int SkillFramesRow = 4;
 
+        //BossAnimation
+        private AnimatedTexture boss2Animate;
+        private const float boss2Rotation = 0;
+        private const float boss2Scale = 1.0f;
+        private const float boss2Depth = 0.5f;
+        private const int boss2Frames = 4;
+        private const int boss2FramesPerSec = 6;
+        private const int boss2FramesRow = 2;
+
         //Enemy
         private Texture2D ball;
         private Bosstwo boss2;
@@ -114,6 +123,7 @@ namespace LastDayInKhuMuang
             playerAnimate = new AnimatedTexture(Vector2.Zero, Rotation, Scale, Depth);
             AttackAnimate = new AnimatedTexture(Vector2.Zero, AttackRotation,AttackScale,AttackDepth);
             SkillAnimate = new AnimatedTexture(Vector2.Zero,SkillRotation,SkillScale,SkillDepth);
+            boss2Animate = new AnimatedTexture(Vector2.Zero, boss2Rotation, boss2Scale, boss2Depth);
         }
 
         protected override void Initialize()
@@ -140,6 +150,7 @@ namespace LastDayInKhuMuang
             playerAnimate.Load(Content, "Player_all_set", Frames, FramesRow, FramesPerSec);
             AttackAnimate.Load(Content, "Effect_Attack", AttackFrames, AttackFramesRow, AttackFramesPerSec);
             SkillAnimate.Load(Content,"set-Skill-E",SkillFrames,SkillFramesRow,SkillFramesPerSec);
+            boss2Animate.Load(Content, "BossTuderbolt", boss2Frames, boss2FramesRow, boss2FramesPerSec);
             player.SetAction(1);
             //Setup player
             //entities.Add(new PlayerEntity(this, new RectangleF(new Point2(32, 470), new Size2(56, 56))));
@@ -175,6 +186,7 @@ namespace LastDayInKhuMuang
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             getElapsed = elapsed;
             player.SetElapsed(elapsed);
+            boss2Animate.UpdateFrame(elapsed);
             //foreach (IEntity entity in entities)
             //{
             //    entity.Update(gameTime);
@@ -289,7 +301,7 @@ namespace LastDayInKhuMuang
             }
             else if (changeScenes.GetScenes() == 2)
             {
-                boss2.BossDraw();
+                boss2.BossDraw(_spriteBatch, boss2Animate);
             }
 
             //Draw Player            

@@ -52,6 +52,8 @@ namespace LastDayInKhuMuang
         private Texture2D boss2Texture;
         SpriteBatch spriteBatch;
         Game1 game;
+        private const int bossHeight = 768;
+        private const int bossWidth = 768;
         private int health;
         private Vector2 bossPos;
         private Vector2 playerPos;
@@ -69,7 +71,7 @@ namespace LastDayInKhuMuang
         }
         public void SetBossPos(GraphicsDeviceManager graphics)
         {
-            bossPos = new Vector2(graphics.GraphicsDevice.Viewport.Width - boss2Texture.Width, graphics.GraphicsDevice.Viewport.Height - boss2Texture.Height);
+            bossPos = new Vector2(graphics.GraphicsDevice.Viewport.Width - bossWidth, graphics.GraphicsDevice.Viewport.Height - bossHeight);
         }
         public void BossLoad()
         {
@@ -140,7 +142,7 @@ namespace LastDayInKhuMuang
             LightningRod(gameTime);
         }
 
-        public void BossDraw()
+        public void BossDraw(SpriteBatch spriteBatch, AnimatedTexture boss2Aniamte)
         {
             if (usedrod)
             {
@@ -154,8 +156,9 @@ namespace LastDayInKhuMuang
             if (usedLightningBeam)
             {
                 spriteBatch.Draw(damageLightningBeamArea, lightningBeamPos, Color.White);
-            }            
-            spriteBatch.Draw(boss2Texture, bossPos, Color.White);
+            }
+            boss2Aniamte.DrawFrame(spriteBatch, bossPos);
+            //spriteBatch.Draw(boss2Texture, bossPos, Color.White);
         }
 
         //Start attack
