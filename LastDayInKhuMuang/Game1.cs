@@ -124,6 +124,8 @@ namespace LastDayInKhuMuang
             AttackAnimate = new AnimatedTexture(Vector2.Zero, AttackRotation,AttackScale,AttackDepth);
             SkillAnimate = new AnimatedTexture(Vector2.Zero,SkillRotation,SkillScale,SkillDepth);
             boss2Animate = new AnimatedTexture(Vector2.Zero, boss2Rotation, boss2Scale, boss2Depth);
+
+            Bosstwo.Initialization();
         }
 
         protected override void Initialize()
@@ -151,6 +153,7 @@ namespace LastDayInKhuMuang
             AttackAnimate.Load(Content, "Effect_Attack", AttackFrames, AttackFramesRow, AttackFramesPerSec);
             SkillAnimate.Load(Content,"set-Skill-E",SkillFrames,SkillFramesRow,SkillFramesPerSec);
             boss2Animate.Load(Content, "BossTuderbolt", boss2Frames, boss2FramesRow, boss2FramesPerSec);
+            
             player.SetAction(1);
             //Setup player
             //entities.Add(new PlayerEntity(this, new RectangleF(new Point2(32, 470), new Size2(56, 56))));
@@ -162,7 +165,7 @@ namespace LastDayInKhuMuang
             //Load Enemy Content
             ball = Content.Load<Texture2D>("Resources/ball");
             boss2 = new Bosstwo(bossHp, player.GetPlayerPos(), _spriteBatch, this);
-            boss2.BossLoad();
+            boss2.BossLoad(this);
             boss2.SetBossPos(_graphics);
 
             //Load Map Content
@@ -186,7 +189,8 @@ namespace LastDayInKhuMuang
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             getElapsed = elapsed;
             player.SetElapsed(elapsed);
-            boss2Animate.UpdateFrame(elapsed);
+            boss2.SetElapsed(elapsed);
+            //boss2Animate.UpdateFrame(elapsed);
             //foreach (IEntity entity in entities)
             //{
             //    entity.Update(gameTime);
@@ -247,7 +251,7 @@ namespace LastDayInKhuMuang
                 {
                     player.SetPosition(changeScenes.GetPlayerSpawn());
                 }
-                boss2.BossUpdate(player.GetPlayerPos(), gameTime, playerBox);                
+                boss2.BossUpdate(player.GetPlayerPos(), gameTime, playerBox, boss2Animate);                
                 //player.SetPosition(new Vector2(200,200));
                 ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth, MapHeight);
                 camera = new OrthographicCamera(viewportadpter);

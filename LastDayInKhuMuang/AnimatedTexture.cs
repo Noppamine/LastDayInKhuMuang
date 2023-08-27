@@ -23,7 +23,7 @@ namespace LastDayInKhuMuang
         private float TimePerFrame;
         public int Frame;
         private int framerow = 1; // frame row
-        private int frame_r; // count frame row 
+        public int frame_r; // count frame row 
         private int startframe;
         private int endframe;
         private float TotalElapsed;
@@ -189,6 +189,12 @@ namespace LastDayInKhuMuang
         public void Reset()
         {
             Frame = 0;
+            TotalElapsed = 0f;
+        }
+        public void ResetAll()
+        {
+            Frame = 0;
+            frame_r = 0;
             TotalElapsed = 0f;
         }
         public void Stop()

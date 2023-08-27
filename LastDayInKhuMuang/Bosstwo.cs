@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Timers;
+using SharpDX.Direct2D1.Effects;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,14 @@ namespace LastDayInKhuMuang
         private Texture2D thunderBolt;
         private Vector2 thunderBoltPos;
         private float thunderCooldown;
+        //Animate
+        static AnimatedTexture boltAnimate;
+        private const float boltRotation = 0;
+        private const float boltScale = 1.0f;
+        private const float boltDepth = 0.5f;
+        private const int boltFrames = 10;
+        private const int boltFramesPerSec = 6;
+        private const int boltFramesRow = 1;
 
         //Beam
         private Vector2 lightningBeamPos;
@@ -34,6 +43,14 @@ namespace LastDayInKhuMuang
         private Texture2D damageLightningBeamArea;
         private float beamCooldown;
         private float delayBeam;
+        //Animate
+        static AnimatedTexture beamAnimate;
+        private const float beamRotation = 0;
+        private const float beamScale = 1.0f;
+        private const float beamDepth = 0.5f;
+        private const int beamFrames = 1;
+        private const int beamFramesPerSec = 6;
+        private const int beamFramesRow = 8;
 
         //Rod
         private Texture2D damageLightningRod;
@@ -46,7 +63,7 @@ namespace LastDayInKhuMuang
         private float shockEffect;
         private float rodCooldown;
 
-
+        private float elapsed;
         private float bossTime;
 
         private Texture2D boss2Texture;
@@ -73,17 +90,29 @@ namespace LastDayInKhuMuang
         {
             bossPos = new Vector2(graphics.GraphicsDevice.Viewport.Width - bossWidth, graphics.GraphicsDevice.Viewport.Height - bossHeight);
         }
-        public void BossLoad()
+        public void SetElapsed(float elapsed)
+        {
+            this.elapsed = elapsed;
+        }
+        public static void Initialization()
+        {
+           // boltAnimate = new AnimatedTexture(Vector2.Zero, boltRotation, boltScale, boltDepth);
+            beamAnimate = new AnimatedTexture(Vector2.Zero, beamRotation, beamScale, beamDepth);
+        }
+        public void BossLoad(Game1 game)
         {
             boss2Texture = game.Content.Load<Texture2D>("Resources/Boss/Boss-Attack-TunderBold-Access");
             thunderBolt = game.Content.Load<Texture2D>("Resources/ball");
             damageThunderboltArea = new Texture2D(game.GraphicsDevice, 60, 60);
             damageLightningBeamArea = new Texture2D(game.GraphicsDevice, 1690, 60);
-            damageLightningRod = new Texture2D(game.GraphicsDevice, boss2Texture.Height + 200, boss2Texture.Width);
+            damageLightningRod = new Texture2D(game.GraphicsDevice, 768, 768/2);
+
+           // boltAnimate.Load(game.Content, "Resources/Boss/Animation-Tunder_Boss", boltFrames, boltFramesRow, boltFramesPerSec);
+            beamAnimate.Load(game.Content, "Resources/Boss/ShootLighting_Boss", beamFrames, beamFramesRow, beamFramesPerSec);
 
             dataBolt = new Color[60*60];
             dataBeam = new Color[1690*60];
-            dataRod = new Color[(boss2Texture.Height + 200) * boss2Texture.Width];
+            dataRod = new Color[(768) * (768 / 2)];
 
             usedThunderBolt = false;
             usedLightningBeam = false;
@@ -106,12 +135,13 @@ namespace LastDayInKhuMuang
             damageLightningBeamArea.SetData(dataBeam);
             damageLightningRod.SetData(dataRod);
         }
-        public void BossUpdate(Vector2 playerPos, GameTime gameTime, Rectangle playerBox)
+        public void BossUpdate(Vector2 playerPos, GameTime gameTime, Rectangle playerBox, AnimatedTexture bossAnimate)
         {
+            bossAnimate.UpdateFrame(elapsed);
             this.playerBox = playerBox;
-            lightningRod = new Vector2(bossPos.X - 50, 100 /*bossPos.Y + (boss2Texture.Height / 2)*/);
+            lightningRod = new Vector2(bossPos.X, bossPos.Y + (768/2) /*bossPos.Y + (boss2Texture.Height / 2)*/);
             dangArea = new Rectangle((int)bossPos.X, (int)bossPos.Y + (boss2Texture.Height / 2), boss2Texture.Width, boss2Texture.Height);
-            AttackPattern(gameTime);                        
+            AttackPattern(gameTime, bossAnimate);                        
             if (!usedLightningBeam && !usedThunderBolt)
             {
                 this.playerPos = new Vector2(playerBox.X, playerBox.Y);
@@ -138,7 +168,7 @@ namespace LastDayInKhuMuang
             }
             ks = Keyboard.GetState();
             ThunderBolt(gameTime);
-            LightningBeam(gameTime);
+            LightningBeam(gameTime, bossAnimate);
             LightningRod(gameTime);
         }
 
@@ -153,16 +183,36 @@ namespace LastDayInKhuMuang
                 spriteBatch.Draw(thunderBolt, thunderBoltPos, Color.White);
                 spriteBatch.Draw(damageThunderboltArea, playerPos, Color.White);
             }
-            if (usedLightningBeam)
+            if (usedLightningBeam && !beamed)
             {
                 spriteBatch.Draw(damageLightningBeamArea, lightningBeamPos, Color.White);
+                //animate
+                beamAnimate.DrawFrame(spriteBatch, lightningBeamPos);
+                if (beamAnimate.frame_r >= 5)
+                {
+                    beamAnimate.DrawFrame(spriteBatch, 1, lightningBeamPos, 8);
+                }
             }
-            boss2Aniamte.DrawFrame(spriteBatch, bossPos);
+            else if (usedLightningBeam && beamed)
+            {
+                beamAnimate.DrawFrame(spriteBatch, lightningBeamPos);
+            }
+
+            //Boss
+            if (!usedLightningBeam && !usedThunderBolt )
+            {
+                spriteBatch.Draw(boss2Texture, bossPos, Color.White);               
+            }
+            else
+            {
+                boss2Aniamte.DrawFrame(spriteBatch, bossPos);
+            }
+            
             //spriteBatch.Draw(boss2Texture, bossPos, Color.White);
         }
 
         //Start attack
-        public void AttackPattern(GameTime gameTime)
+        public void AttackPattern(GameTime gameTime, AnimatedTexture bossAnimate)
         {
             //LightningRod(gameTime);
             if (readyRandPattern && !usedThunderBolt && !usedLightningBeam /*&& !usedrod*/)
@@ -172,6 +222,7 @@ namespace LastDayInKhuMuang
                 if (bossTime > 2 )
                 {
                     action = rand.Next(0, 3);
+                    //action = 2;
                     switch (action)
                     {
                         case 1:
@@ -180,7 +231,7 @@ namespace LastDayInKhuMuang
                             break;
                         case 2:
                             usedLightningBeam = true;
-                            LightningBeam(gameTime);
+                            LightningBeam(gameTime, bossAnimate);
                             break;
                     }
                 }                
@@ -215,55 +266,83 @@ namespace LastDayInKhuMuang
                 readyRandPattern = true;
             }
         }
-        public void LightningBeam(GameTime time)
+        public void LightningBeam(GameTime time, AnimatedTexture bossAnimate)
         {
             //attack
             //if (ks.IsKeyDown(Keys.NumPad2) && !usedLightningBeam)
             //{
             //    usedLightningBeam = true;
             //}
-
+            //Console.WriteLine(beamAnimate.Frame);
+            //Console.WriteLine(usedLightningBeam);
+            //Console.WriteLine(beamed);
+            Console.WriteLine(beamAnimate.IsEnd);
+            Console.WriteLine("Frame row : " + beamAnimate.frame_r);
             if (!usedLightningBeam)
             {
                 delayBeam = 0;
                 beamCooldown = 0;
                 beamed = false;
-                for (int i = 0; i < dataBeam.Length; i++)
-                {
-                    dataBeam[i] = Color.LightPink;
-                }
-                damageLightningBeamArea.SetData(dataBeam);
-            }
+                bossAnimate.ResetAll();
+                bossAnimate.Pause();
+                beamAnimate.Pause();
+                //animate
+                //for (int i = 0; i < dataBeam.Length; i++)
+                //{
+                //    dataBeam[i] = Color.LightPink;
+                //}
+                //damageLightningBeamArea.SetData(dataBeam);
 
+            }
             if (usedLightningBeam && !beamed)
-            {
-                delayBeam += (float)time.ElapsedGameTime.TotalMilliseconds / 1000;                
-            }
-            if (delayBeam >= 1)
-            {
-                for (int i = 0; i < dataBeam.Length; i++)
+            {                
+                bossAnimate.Play();
+                //delayBeam += (float)time.ElapsedGameTime.TotalMilliseconds / 1000;
+                if (bossAnimate.frame_r == 1 && bossAnimate.Frame == 3)
                 {
-                    dataBeam[i] = Color.Red;
+                    bossAnimate.Pause();
+                    bossAnimate.frame_r = 1; bossAnimate.Frame = 2;
+                    //bossAnimate.Pause();
+                    beamAnimate.Play();
+                    if (beamAnimate.frame_r == 6 && !beamed)
+                    {
+                        beamed = true;
+                        beamAnimate.frame_r = 6;
+                    }
                 }
-                beamed = true;
-                damageLightningBeamArea.SetData(dataBeam);
+                
             }
-
+            
+            //if (delayBeam >= 1)
+            //{
+            //    //animate
+            //    for (int i = 0; i < dataBeam.Length; i++)
+            //    {
+            //        dataBeam[i] = Color.Red;
+            //    }
+            //    beamed = true;
+            //    damageLightningBeamArea.SetData(dataBeam);
+            //}
+            if (usedLightningBeam || beamed)
+            {
+                beamAnimate.UpdateFrame(elapsed);
+            }
             if (beamed)
             {
                 beamCooldown += (float)time.ElapsedGameTime.TotalMilliseconds / 1000;
+                beamAnimate.Pause();
+                //beamAnimate.frame_r = 6;
             }
             if (beamCooldown >= 3)
             {
                 usedLightningBeam = false;
+                beamed = false;
                 readyRandPattern = true;
+                beamAnimate.frame_r = 0;
             }
         }
         public void LightningRod(GameTime gameTime)
-        {
-            Console.WriteLine("readyRod " + readyRod);
-            Console.WriteLine("usedRod " + usedrod);
-            Console.WriteLine("rodCooldown " + rodCooldown);
+        {           
             if (this.playerBox.Intersects(dangArea) && readyRod)
             {
                 usedrod = true;
