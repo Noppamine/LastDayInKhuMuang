@@ -5,6 +5,7 @@ using MonoGame.Extended.Timers;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
@@ -116,6 +117,30 @@ namespace LastDayInKhuMuang
                     idle = false;
                     action = 6;
                     Direction = "Down";
+                }
+                if (ks.IsKeyDown(Keys.D) &&(ks.IsKeyDown(Keys.A)) &&!attack && !Skill)
+                {
+                    idle = true;
+                    if(ks.IsKeyDown(Keys.W))
+                    {
+                        playerPos.Y += speed;
+                    }
+                    if (ks.IsKeyDown(Keys.S))
+                    {
+                        playerPos.Y -= speed;
+                    }
+                }
+                if (ks.IsKeyDown(Keys.W) && (ks.IsKeyDown(Keys.S)) && !attack && !Skill)
+                {
+                    idle = true;
+                    if (ks.IsKeyDown(Keys.A))
+                    {
+                        playerPos.X += speed;
+                    }
+                    if (ks.IsKeyDown(Keys.D))
+                    {
+                        playerPos.X -= speed;
+                    }
                 }
                 if (ks.IsKeyDown(Keys.W) && ks.IsKeyDown(Keys.A))
                 {
@@ -236,6 +261,7 @@ namespace LastDayInKhuMuang
             
         }
 
+        //player attack
         public void PlayerAttack(KeyboardState ks , AnimatedTexture attackanimate)
         {
            //KeyboardState oldks;
@@ -256,11 +282,13 @@ namespace LastDayInKhuMuang
             {
                 attackBox = new Rectangle((int)playerPos.X - ((playerHeight-playerWidth)/2), (int)playerPos.Y - playerWidth, playerHeight, playerWidth);
                 attack = true;
+                idle = true;
             }
             else if (ks.IsKeyDown(Keys.J) && Direction == "Down" && !attack) //Down Attack
             {
                 attackBox = new Rectangle((int)playerPos.X - ((playerHeight - playerWidth) / 2), (int)playerPos.Y + playerHeight, playerHeight, playerWidth);
                 attack = true;
+                idle = true;
             }
             if (ks.IsKeyUp(Keys.J))
             {
