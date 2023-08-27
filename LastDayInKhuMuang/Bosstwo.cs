@@ -21,23 +21,26 @@ namespace LastDayInKhuMuang
         private bool usedLightningBeam;
         private bool readyRandPattern;
 
-        //Bolt
-        private bool beamed;
+        //Bolt        
         private Texture2D damageThunderboltArea;
         private Color[] dataBolt;
         private Texture2D thunderBolt;
         private Vector2 thunderBoltPos;
         private float thunderCooldown;
+        private bool bolted;
+        private const int thunderBoltHeight = 900;
+        private const int thunderBoltWidth = 900;
         //Animate
         static AnimatedTexture boltAnimate;
         private const float boltRotation = 0;
         private const float boltScale = 1.0f;
         private const float boltDepth = 0.5f;
-        private const int boltFrames = 10;
+        private const int boltFrames = 3;
         private const int boltFramesPerSec = 6;
-        private const int boltFramesRow = 1;
+        private const int boltFramesRow = 4;
 
         //Beam
+        private bool beamed;
         private Vector2 lightningBeamPos;
         private Color[] dataBeam;
         private Texture2D damageLightningBeamArea;
@@ -49,7 +52,7 @@ namespace LastDayInKhuMuang
         private const float beamScale = 1.0f;
         private const float beamDepth = 0.5f;
         private const int beamFrames = 1;
-        private const int beamFramesPerSec = 6;
+        private const int beamFramesPerSec = 8;
         private const int beamFramesRow = 8;
 
         //Rod
@@ -96,21 +99,21 @@ namespace LastDayInKhuMuang
         }
         public static void Initialization()
         {
-           // boltAnimate = new AnimatedTexture(Vector2.Zero, boltRotation, boltScale, boltDepth);
+            boltAnimate = new AnimatedTexture(Vector2.Zero, boltRotation, boltScale, boltDepth);
             beamAnimate = new AnimatedTexture(Vector2.Zero, beamRotation, beamScale, beamDepth);
         }
         public void BossLoad(Game1 game)
         {
             boss2Texture = game.Content.Load<Texture2D>("Resources/Boss/Boss-Attack-TunderBold-Access");
             thunderBolt = game.Content.Load<Texture2D>("Resources/ball");
-            damageThunderboltArea = new Texture2D(game.GraphicsDevice, 60, 60);
+            damageThunderboltArea = new Texture2D(game.GraphicsDevice, 900, 60);
             damageLightningBeamArea = new Texture2D(game.GraphicsDevice, 1690, 60);
             damageLightningRod = new Texture2D(game.GraphicsDevice, 768, 768/2);
 
-           // boltAnimate.Load(game.Content, "Resources/Boss/Animation-Tunder_Boss", boltFrames, boltFramesRow, boltFramesPerSec);
+            boltAnimate.Load(game.Content, "Resources/Boss/Animation-ThunderBolt_boss_", boltFrames, boltFramesRow, boltFramesPerSec);
             beamAnimate.Load(game.Content, "Resources/Boss/ShootLighting_Boss", beamFrames, beamFramesRow, beamFramesPerSec);
 
-            dataBolt = new Color[60*60];
+            dataBolt = new Color[900*60];
             dataBeam = new Color[1690*60];
             dataRod = new Color[(768) * (768 / 2)];
 
@@ -163,26 +166,36 @@ namespace LastDayInKhuMuang
             }
             else if (usedThunderBolt)
             {
-                thunderBoltPos.X = this.playerPos.X;
-                thunderBoltPos.Y += 25; //changing
+                thunderBoltPos.X = this.playerPos.X - (thunderBoltWidth/2);
+                thunderBoltPos.Y = (this.playerPos.Y - thunderBoltHeight) + 24; //changing
             }
             ks = Keyboard.GetState();
-            ThunderBolt(gameTime);
+            ThunderBolt(gameTime, bossAnimate);
             LightningBeam(gameTime, bossAnimate);
             LightningRod(gameTime);
         }
 
-        public void BossDraw(SpriteBatch spriteBatch, AnimatedTexture boss2Aniamte)
+        public void BossDraw(SpriteBatch spriteBatch, AnimatedTexture boss2Animate)
         {
             if (usedrod)
             {
                 spriteBatch.Draw(damageLightningRod, lightningRod, Color.White);
             }
-            if (usedThunderBolt && thunderBoltPos.Y <= playerPos.Y)
+
+            if (usedThunderBolt)
             {
-                spriteBatch.Draw(thunderBolt, thunderBoltPos, Color.White);
-                spriteBatch.Draw(damageThunderboltArea, playerPos, Color.White);
+                //spriteBatch.Draw(thunderBolt, thunderBoltPos, Color.White);
+                
+                if (!bolted)
+                {
+                    spriteBatch.Draw(damageThunderboltArea, new Vector2(thunderBoltPos.X, thunderBoltPos.Y + thunderBoltHeight), Color.White);
+                } 
+                else if (boss2Animate.frame_r == 1 && boss2Animate.Frame == 3)
+                {
+                    boltAnimate.DrawFrame(spriteBatch, thunderBoltPos + new Vector2(0f, 48));
+                }
             }
+
             if (usedLightningBeam && !beamed)
             {
                 spriteBatch.Draw(damageLightningBeamArea, lightningBeamPos, Color.White);
@@ -205,7 +218,7 @@ namespace LastDayInKhuMuang
             }
             else
             {
-                boss2Aniamte.DrawFrame(spriteBatch, bossPos);
+                boss2Animate.DrawFrame(spriteBatch, bossPos);
             }
             
             //spriteBatch.Draw(boss2Texture, bossPos, Color.White);
@@ -221,13 +234,13 @@ namespace LastDayInKhuMuang
                 int action;
                 if (bossTime > 2 )
                 {
-                    action = rand.Next(0, 3);
-                    //action = 2;
+                    //action = rand.Next(0, 3);
+                    action = 2;
                     switch (action)
                     {
                         case 1:
                             usedThunderBolt = true;
-                            ThunderBolt(gameTime);
+                            ThunderBolt(gameTime, bossAnimate);
                             break;
                         case 2:
                             usedLightningBeam = true;
@@ -245,14 +258,27 @@ namespace LastDayInKhuMuang
             //    bossTime = 0;
             //}            
         }
-        public async void ThunderBolt(GameTime time)
+        public async void ThunderBolt(GameTime time, AnimatedTexture bossAnimate)
         {
-            if (usedThunderBolt && thunderBoltPos.Y >= playerPos.Y)
+            if (usedThunderBolt)
             {
+                bossAnimate.UpdateFrame(elapsed);
+                bossAnimate.Play();
                 thunderCooldown += (float)time.ElapsedGameTime.TotalMilliseconds / 1000;
+                if (bossAnimate.frame_r == 1 && bossAnimate.Frame == 3)
+                {
+                    bolted = true;
+                    boltAnimate.UpdateFrame(elapsed);
+                    bossAnimate.Pause();
+                    bossAnimate.Frame = 3;
+                    bossAnimate.frame_r = 1;
+                }                
             }
-            else if(!usedThunderBolt)
+            else if(!usedThunderBolt && !usedLightningBeam)
             {
+                boltAnimate.ResetAll();
+                bossAnimate.ResetAll();
+                bolted = false;
                 thunderCooldown = 0;
             }
             //attack
@@ -260,7 +286,7 @@ namespace LastDayInKhuMuang
             //{
             //    usedThunderBolt = true;
             //}
-            if (thunderCooldown >= 3)
+            if (boltAnimate.frame_r == 3 && boltAnimate.Frame == 1)
             {
                 usedThunderBolt = false;
                 readyRandPattern = true;
@@ -278,12 +304,14 @@ namespace LastDayInKhuMuang
             //Console.WriteLine(beamed);
             Console.WriteLine(beamAnimate.IsEnd);
             Console.WriteLine("Frame row : " + beamAnimate.frame_r);
-            if (!usedLightningBeam)
+            if (!usedLightningBeam && !usedThunderBolt)
             {
                 delayBeam = 0;
                 beamCooldown = 0;
                 beamed = false;
                 bossAnimate.ResetAll();
+                beamAnimate.frame_r = 0;
+                beamAnimate.Frame = 1;
                 bossAnimate.Pause();
                 beamAnimate.Pause();
                 //animate
@@ -301,7 +329,7 @@ namespace LastDayInKhuMuang
                 if (bossAnimate.frame_r == 1 && bossAnimate.Frame == 3)
                 {
                     bossAnimate.Pause();
-                    bossAnimate.frame_r = 1; bossAnimate.Frame = 2;
+                    bossAnimate.frame_r = 1; bossAnimate.Frame = 3;
                     //bossAnimate.Pause();
                     beamAnimate.Play();
                     if (beamAnimate.frame_r == 6 && !beamed)
@@ -312,7 +340,7 @@ namespace LastDayInKhuMuang
                 }
                 
             }
-            
+
             //if (delayBeam >= 1)
             //{
             //    //animate
@@ -323,15 +351,15 @@ namespace LastDayInKhuMuang
             //    beamed = true;
             //    damageLightningBeamArea.SetData(dataBeam);
             //}
-            if (usedLightningBeam || beamed)
+            if (beamed || usedLightningBeam)
             {
                 beamAnimate.UpdateFrame(elapsed);
             }
             if (beamed)
-            {
+            {                
                 beamCooldown += (float)time.ElapsedGameTime.TotalMilliseconds / 1000;
                 beamAnimate.Pause();
-                //beamAnimate.frame_r = 6;
+                beamAnimate.frame_r = 6;
             }
             if (beamCooldown >= 3)
             {

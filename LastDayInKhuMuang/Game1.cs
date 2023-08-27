@@ -89,7 +89,7 @@ namespace LastDayInKhuMuang
         private const float boss2Scale = 1.0f;
         private const float boss2Depth = 0.5f;
         private const int boss2Frames = 4;
-        private const int boss2FramesPerSec = 6;
+        private const int boss2FramesPerSec = 5;
         private const int boss2FramesRow = 2;
 
         //Enemy

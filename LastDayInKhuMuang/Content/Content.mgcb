@@ -62,7 +62,7 @@
 /processorParam:TextureFormat=Color
 /build:Resources/ball.png
 
-#begin Resources/Boss/Animation-Tunder_Boss.png
+#begin Resources/Boss/Animation-ThunderBolt_boss_.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -72,7 +72,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Resources/Boss/Animation-Tunder_Boss.png
+/build:Resources/Boss/Animation-ThunderBolt_boss_.png
 
 #begin Resources/Boss/Boss-Attack-TunderBold-Access.png
 /importer:TextureImporter
