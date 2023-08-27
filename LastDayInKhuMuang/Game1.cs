@@ -183,7 +183,7 @@ namespace LastDayInKhuMuang
             player.PlayerMove(ks, _graphics, playerAnimate,AttackAnimate, SkillAnimate,gameTime);
             playerPos = player.GetPlayerPos();
             //player Hitbox
-            playerBox = new Rectangle((int)playerPos.X + 20,(int)playerPos.Y + 96,88,32);
+            playerBox = new Rectangle((int)playerPos.X + 40,(int)playerPos.Y + 80,48,48);
             //Skill Direction Update Time
             if (player.GetPlayerSkill())
             {
@@ -206,6 +206,7 @@ namespace LastDayInKhuMuang
             {
                 skillPos.Y = skillPos.Y + 10;
             }
+            //skill hitbox
             skillBox = new Rectangle((int)skillPos.X, (int)skillPos.Y, 128, 128);
 
             //Camera
@@ -265,7 +266,7 @@ namespace LastDayInKhuMuang
             //    entity.Draw(_spriteBatch);
             //}
 
-            //Draw Player            
+            //Draw Player and animate           
             if (!player.GetIdle())
             {
                 playerAnimate.DrawFrame(_spriteBatch, playerPos, player.GetAction());
@@ -279,6 +280,14 @@ namespace LastDayInKhuMuang
                 else if (player.GetPlayerAttack() && player.GetDirection() == "Left") // left attack animate
                 {
                     playerAnimate.DrawFrame(_spriteBatch, playerPos, 4);
+                }
+                else if (player.GetPlayerAttack() && player.GetDirection() == "Up") // up attack animate
+                {
+                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
+                }
+                else if (player.GetPlayerAttack() && player.GetDirection() == "Down") // down attack animate
+                {
+                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
                 }
                 else if (player.GetPlayerSkill() && player.GetSkillDirection() == "Left") // left skill attack animate
                 {
@@ -353,10 +362,20 @@ namespace LastDayInKhuMuang
                 playerAnimate.DrawFrame(_spriteBatch, playerPos,3);
                 AttackAnimate.DrawFrame(_spriteBatch,playerPos,1);
             }
-            if (player.GetPlayerAttack() && player.GetDirection() == "Left") // right attack
+            if (player.GetPlayerAttack() && player.GetDirection() == "Left") // left attack
             {
                 playerAnimate.DrawFrame(_spriteBatch, playerPos, 4);
                 AttackAnimate.DrawFrame(_spriteBatch, playerPos, 2);
+            }
+            if (player.GetPlayerAttack() && player.GetDirection() == "Up") // up attack
+            {
+                playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
+                AttackAnimate.DrawFrame(_spriteBatch, playerPos, 1);
+            }
+            if (player.GetPlayerAttack() && player.GetDirection() == "Down") // down attack
+            {
+                playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
+                AttackAnimate.DrawFrame(_spriteBatch, playerPos, 1);
             }
 
             //Draw Scenes
