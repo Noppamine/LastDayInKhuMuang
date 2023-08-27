@@ -53,6 +53,7 @@ namespace LastDayInKhuMuang
         private Vector2 skillPos = new Vector2(200, 200);
         private Vector2 skillspeed = new Vector2(1, 1);
         Rectangle skillBox = new Rectangle();
+        private string SkillDirection;
 
         //PlayerAnimation
         private AnimatedTexture playerAnimate;
@@ -71,6 +72,15 @@ namespace LastDayInKhuMuang
         private const int AttackFrames = 10;
         private const int AttackFramesPerSec = 12;
         private const int AttackFramesRow = 2;
+
+        //SkillAnimation
+        private AnimatedTexture SkillAnimate;
+        private const float SkillRotation = 0;
+        private const float SkillScale = 1.0f;
+        private const float SkillDepth = 0.5f;
+        private const int SkillFrames = 4;
+        private const int SkillFramesPerSec = 6;
+        private const int SkillFramesRow = 4;
 
         //Enemy
         private Texture2D ball;
@@ -102,6 +112,7 @@ namespace LastDayInKhuMuang
             //Set Sprite
             playerAnimate = new AnimatedTexture(Vector2.Zero, Rotation, Scale, Depth);
             AttackAnimate = new AnimatedTexture(Vector2.Zero, AttackRotation,AttackScale,AttackDepth);
+            SkillAnimate = new AnimatedTexture(Vector2.Zero,SkillRotation,SkillScale,SkillDepth);
         }
 
         protected override void Initialize()
@@ -127,6 +138,7 @@ namespace LastDayInKhuMuang
             player = new Player(speed, boostSpeed, hp, stamina, playerPos, skillPos);
             playerAnimate.Load(Content, "Player01", Frames, FramesRow, FramesPerSec);
             AttackAnimate.Load(Content, "Effect_Attack", AttackFrames, AttackFramesRow, AttackFramesPerSec);
+            SkillAnimate.Load(Content,"set-Skill-E",SkillFrames,SkillFramesRow,SkillFramesPerSec);
             player.SetAction(1);
             //Setup player
             //entities.Add(new PlayerEntity(this, new RectangleF(new Point2(32, 470), new Size2(56, 56))));
@@ -167,7 +179,7 @@ namespace LastDayInKhuMuang
             //    entity.Update(gameTime);
             //}
             //collisionComponent.Update(gameTime);
-            player.PlayerMove(ks, _graphics, playerAnimate,AttackAnimate, gameTime);
+            player.PlayerMove(ks, _graphics, playerAnimate,AttackAnimate, SkillAnimate,gameTime);
             playerPos = player.GetPlayerPos();
             //Skill Direction Update Time
             if (player.GetPlayerSkill())
@@ -191,7 +203,7 @@ namespace LastDayInKhuMuang
             {
                 skillPos.Y = skillPos.Y + 10;
             }
-            skillBox = new Rectangle((int)skillPos.X, (int)skillPos.Y, 24, 24);
+            skillBox = new Rectangle((int)skillPos.X, (int)skillPos.Y, 128, 128);
 
             //Camera
             if (ks.IsKeyDown(Keys.F11) && _graphics.IsFullScreen == false)
@@ -232,7 +244,7 @@ namespace LastDayInKhuMuang
             //Scenes Update
             changeScenes.UpdateScenes(ks);
 
-            
+            Console.WriteLine(SkillAnimate.Frame);
             base.Update(gameTime);
         }
         Rectangle ballRectangle = new Rectangle(250, 250, 24, 24);
@@ -268,16 +280,24 @@ namespace LastDayInKhuMuang
             {               
                 playerAnimate.DrawFrame(_spriteBatch, playerPos, player.GetAction());                
             }
-            else if (player.GetIdle())
+            else if (player.GetIdle() || player.GetSkillTime())
             {
                 
                 if (player.GetPlayerAttack() && player.GetDirection() == "Right") // right attack
                 {
                     playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
                 }
-                else if (player.GetPlayerAttack() && player.GetDirection() == "Left") // right attack
+                else if (player.GetPlayerAttack() && player.GetDirection() == "Left") // left attack
                 {
                     playerAnimate.DrawFrame(_spriteBatch, playerPos, 4);
+                }
+                else if (player.GetPlayerSkill() && player.GetDirection() == "Left") // left attack
+                {
+                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 4);
+                }
+                else if (player.GetPlayerSkill() && player.GetDirection() == "Right") // right attack
+                {
+                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
                 }
                 else
                 playerAnimate.DrawFrame(_spriteBatch, 0, playerPos, player.GetAction());
@@ -289,8 +309,26 @@ namespace LastDayInKhuMuang
             {
                 if (skillPos.X > 0 && skillPos.X < _graphics.GraphicsDevice.Viewport.Width && skillPos.Y > 0 && skillPos.Y < _graphics.GraphicsDevice.Viewport.Width)
                 {
-                    _spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y), skillBox, Color.White);
-                    _spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y), new Rectangle(0, 0, 24, 24), Color.White);
+                    //_spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y), skillBox, Color.White);
+                    //_spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y), new Rectangle(0, 0, 24, 24), Color.White);
+                    if (player.GetSkillDirection() == "Right") // right skill
+                    {
+                        SkillAnimate.DrawFrame(_spriteBatch, new Vector2(skillPos.X, skillPos.Y), 1);
+                        if(SkillAnimate.IsEnd)
+                        {
+                            SkillAnimate.DrawFrame(_spriteBatch, 4, new Vector2(skillPos.X, skillPos.Y), 1);
+                            SkillAnimate.Pause(4,1);
+                            //SkillAnimate.DrawFrame(_spriteBatch,4, new Vector2(skillPos.X, skillPos.Y), 1);
+                        }
+                        else
+                        {
+                            SkillAnimate.DrawFrame(_spriteBatch, new Vector2(skillPos.X, skillPos.Y), 1);
+                        }
+                    }
+                    if (player.GetSkillDirection() == "Left" ) // left skill
+                    {
+                        SkillAnimate.DrawFrame(_spriteBatch, new Vector2(skillPos.X, skillPos.Y), 2);
+                    }
                 }
             }
 

@@ -21,7 +21,7 @@ namespace LastDayInKhuMuang
         private int framecount;
         private Texture2D myTexture;
         private float TimePerFrame;
-        private int Frame;
+        public int Frame;
         private int framerow = 1; // frame row
         private int frame_r; // count frame row 
         private int startframe;
