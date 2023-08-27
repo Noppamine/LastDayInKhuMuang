@@ -107,14 +107,14 @@ namespace LastDayInKhuMuang
                 {
                     playerPos.Y -= speed;
                     idle = false;
-                    action = 1;
+                    action = 5;
                     Direction = "Up";
                 }
                 if (ks.IsKeyDown(Keys.S) && !attack && !Skill)
                 {
                     playerPos.Y += speed;
                     idle = false;
-                    action = 1;
+                    action = 6;
                     Direction = "Down";
                 }
                 if (ks.IsKeyDown(Keys.W) && ks.IsKeyDown(Keys.A))
@@ -144,7 +144,7 @@ namespace LastDayInKhuMuang
             {
                 idle = true;
             }
-            PlayerSkill(ks , gametime , animate , skillanimate);
+            PlayerSkill(ks , gametime , animate , attackanimate, skillanimate);
             if (ks.IsKeyUp(Keys.A) && ks.IsKeyUp(Keys.D) && ks.IsKeyUp(Keys.W) && ks.IsKeyUp(Keys.S))
              {
                 idle = true;
@@ -252,12 +252,12 @@ namespace LastDayInKhuMuang
                 attack = true;
                 idle = true;
             }
-            else if (ks.IsKeyDown(Keys.J) && action == 4 && !attack) //Up Attack
+            else if (ks.IsKeyDown(Keys.J) && Direction == "Up" && !attack) //Up Attack
             {
                 attackBox = new Rectangle((int)playerPos.X - ((playerHeight-playerWidth)/2), (int)playerPos.Y - playerWidth, playerHeight, playerWidth);
                 attack = true;
             }
-            else if (ks.IsKeyDown(Keys.J) && action == 1 && !attack) //Down Attack
+            else if (ks.IsKeyDown(Keys.J) && Direction == "Down" && !attack) //Down Attack
             {
                 attackBox = new Rectangle((int)playerPos.X - ((playerHeight - playerWidth) / 2), (int)playerPos.Y + playerHeight, playerHeight, playerWidth);
                 attack = true;
@@ -265,10 +265,11 @@ namespace LastDayInKhuMuang
             if (ks.IsKeyUp(Keys.J))
             {
                 attack = false;
+                attackanimate.Reset();
             }
         }
     //Player Skill
-    public void PlayerSkill(KeyboardState ks, GameTime gametime , AnimatedTexture animated ,AnimatedTexture skillanimate)
+    public void PlayerSkill(KeyboardState ks, GameTime gametime , AnimatedTexture animated ,AnimatedTexture attackanimate,AnimatedTexture skillanimate)
         {
             if (ks.IsKeyDown(Keys.E) && action == 2 && !Skill && stamina == 3) //Left Skill
             {
@@ -276,6 +277,7 @@ namespace LastDayInKhuMuang
                 Skill = true;
                 skillpress = true;
                 skilltime = true;
+                idle = true;
                 stamina = 0;
                 skillPos.X = playerPos.X;
                 skillPos.Y = playerPos.Y+10;
@@ -286,42 +288,42 @@ namespace LastDayInKhuMuang
                 Skill = true;
                 skillpress = true;
                 skilltime = true;
+                idle = true;
                 stamina = 0;
                 skillPos.X = playerPos.X+8;
                 skillPos.Y = playerPos.Y+10;
             }
-            else if (ks.IsKeyDown(Keys.E) && action == 4 && !Skill && stamina == 3) //Up Skill
+            else if (ks.IsKeyDown(Keys.E) && action == 5 && !Skill && stamina == 3) //Up Skill
             {
-
+                SkillDirection = "Up";
                 Skill = true;
                 skillpress = true;
                 skilltime = true;
+                idle = true;
                 stamina = 0;
                 skillPos.X = playerPos.X+4;
                 skillPos.Y = playerPos.Y;
             }
-            else if (ks.IsKeyDown(Keys.E) && action == 1 && !Skill && stamina == 3) //Down Skill
+            else if (ks.IsKeyDown(Keys.E) && action == 6 && !Skill && stamina == 3) //Down Skill
             {
-
+                SkillDirection = "Down";
                 Skill = true;
                 skillpress = true;
                 skilltime = true;
+                idle = true;
                 stamina = 0;
                 skillPos.X = playerPos.X+4;
                 skillPos.Y = playerPos.Y;
             }
             if (skilltime)
             {
-                SkillTime(gametime , skillanimate);
+                SkillTime(gametime ,animated,attackanimate, skillanimate);
             }
             if (skillpress)
             {
                 SkillPress(gametime , animated, skillanimate);
             }
-            if(ks.IsKeyDown (Keys.R)) 
-            {
-                skillanimate.Reset();
-            }
+
         }
         //Reset Skillposition
         public void SkillPress(GameTime gametime , AnimatedTexture animated ,AnimatedTexture skillanimate)
@@ -335,7 +337,7 @@ namespace LastDayInKhuMuang
             }
         }
         //SkillTime
-        public void SkillTime(GameTime gametime , AnimatedTexture skillanimate)
+        public void SkillTime(GameTime gametime , AnimatedTexture animated, AnimatedTexture attackanimate, AnimatedTexture skillanimate)
         {
             skilltimer += (float)gametime.ElapsedGameTime.TotalMilliseconds / 1000;
             //Console.WriteLine(skilltimer);
@@ -345,6 +347,7 @@ namespace LastDayInKhuMuang
                 stamina = 3;
                 skilltime = false;
                 skillanimate.Reset();
+                attackanimate.Reset();
             }
 
         }

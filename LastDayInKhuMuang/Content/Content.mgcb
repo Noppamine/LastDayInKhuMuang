@@ -26,7 +26,7 @@
 /processorParam:TextureFormat=Color
 /build:Effect_Attack.png
 
-#begin Player01.png
+#begin Player_all_set.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -36,19 +36,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Player01.png
-
-#begin Player01.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Player01.png
+/build:Player_all_set.png
 
 #begin Resources/ball.png
 /importer:TextureImporter

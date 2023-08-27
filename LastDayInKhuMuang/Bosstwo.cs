@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
+using MonoGame.Extended.Timers;
+using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,10 +36,13 @@ namespace LastDayInKhuMuang
         private float delayBeam;
 
         //Rod
-        private Texture2D damgeLightningRod;
+        private Texture2D damageLightningRod;
         private Vector2 lightningRod;
         private Color[] dataRod;
-        private Rectangle dangArea;
+        private Rectangle dangArea; //not sure
+        private bool usedrod;
+        private bool readyRod;
+        private float delayShock;
         private float shockEffect;
         private float rodCooldown;
 
@@ -50,6 +55,7 @@ namespace LastDayInKhuMuang
         private int health;
         private Vector2 bossPos;
         private Vector2 playerPos;
+        private Rectangle playerBox;
         private Rectangle bossHitbox;
         private Random rand;
         //private Rectangle checkPlayer;
@@ -57,7 +63,7 @@ namespace LastDayInKhuMuang
         {
             this.playerPos = playerPos;
             this.spriteBatch = spriteBatch;
-            this.game = game;
+            this.game = game;            
             health = hp;
             rand = new Random();
         }
@@ -71,11 +77,17 @@ namespace LastDayInKhuMuang
             thunderBolt = game.Content.Load<Texture2D>("Resources/ball");
             damageThunderboltArea = new Texture2D(game.GraphicsDevice, 60, 60);
             damageLightningBeamArea = new Texture2D(game.GraphicsDevice, 1690, 60);
+            damageLightningRod = new Texture2D(game.GraphicsDevice, boss2Texture.Height + 200, boss2Texture.Width);
+
             dataBolt = new Color[60*60];
             dataBeam = new Color[1690*60];
+            dataRod = new Color[(boss2Texture.Height + 200) * boss2Texture.Width];
+
             usedThunderBolt = false;
             usedLightningBeam = false;
+            usedrod = false;
             readyRandPattern = true;
+            readyRod = true;
             for (int i=0; i < dataBolt.Length; i++)
             {
                 dataBolt[i] = Color.LightPink;
@@ -84,21 +96,28 @@ namespace LastDayInKhuMuang
             {
                 dataBeam[i] = Color.LightPink;
             }
+            for (int i=0; i < dataRod.Length; i++)
+            {
+                dataRod[i] = Color.LightPink;
+            }
             damageThunderboltArea.SetData(dataBolt);
             damageLightningBeamArea.SetData(dataBeam);
+            damageLightningRod.SetData(dataRod);
         }
-        public void BossUpdate(Vector2 playerPos, GameTime gameTime)
+        public void BossUpdate(Vector2 playerPos, GameTime gameTime, Rectangle playerBox)
         {
-            //AttackPattern();
-            AttackPattern(gameTime);
+            this.playerBox = playerBox;
+            lightningRod = new Vector2(bossPos.X - 50, 100 /*bossPos.Y + (boss2Texture.Height / 2)*/);
+            dangArea = new Rectangle((int)bossPos.X, (int)bossPos.Y + (boss2Texture.Height / 2), boss2Texture.Width, boss2Texture.Height);
+            AttackPattern(gameTime);                        
             if (!usedLightningBeam && !usedThunderBolt)
             {
-                this.playerPos = playerPos;
+                this.playerPos = new Vector2(playerBox.X, playerBox.Y);
             }
 
             if (!usedLightningBeam)
             {                
-                lightningBeamPos = new Vector2(0, playerPos.Y);
+                lightningBeamPos = new Vector2(0, playerBox.Y);
             }
             else if (usedLightningBeam && beamed)
             {
@@ -107,23 +126,26 @@ namespace LastDayInKhuMuang
 
             if (!usedThunderBolt)
             {                
-                thunderBoltPos.X = playerPos.X;
+                thunderBoltPos.X = playerBox.X;
                 thunderBoltPos.Y = 0;
             }
             else if (usedThunderBolt)
             {
                 thunderBoltPos.X = this.playerPos.X;
-                thunderBoltPos.Y += 25;
+                thunderBoltPos.Y += 25; //changing
             }
             ks = Keyboard.GetState();
             ThunderBolt(gameTime);
             LightningBeam(gameTime);
-            Console.WriteLine("BossTime : "+bossTime);
+            LightningRod(gameTime);
         }
 
         public void BossDraw()
         {
-            spriteBatch.Draw(boss2Texture, bossPos, Color.White);
+            if (usedrod)
+            {
+                spriteBatch.Draw(damageLightningRod, lightningRod, Color.White);
+            }
             if (usedThunderBolt && thunderBoltPos.Y <= playerPos.Y)
             {
                 spriteBatch.Draw(thunderBolt, thunderBoltPos, Color.White);
@@ -132,17 +154,19 @@ namespace LastDayInKhuMuang
             if (usedLightningBeam)
             {
                 spriteBatch.Draw(damageLightningBeamArea, lightningBeamPos, Color.White);
-            }
+            }            
+            spriteBatch.Draw(boss2Texture, bossPos, Color.White);
         }
 
         //Start attack
         public void AttackPattern(GameTime gameTime)
         {
-            if (readyRandPattern && !usedThunderBolt && !usedLightningBeam)
+            //LightningRod(gameTime);
+            if (readyRandPattern && !usedThunderBolt && !usedLightningBeam /*&& !usedrod*/)
             {
                 bossTime += (float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000;
                 int action;
-                if (bossTime > 3 )
+                if (bossTime > 2 )
                 {
                     action = rand.Next(0, 3);
                     switch (action)
@@ -158,7 +182,7 @@ namespace LastDayInKhuMuang
                     }
                 }                
             }
-            else if (!readyRandPattern || usedLightningBeam || usedThunderBolt)
+            else if (!readyRandPattern || usedLightningBeam || usedThunderBolt || usedrod)
             {
                 bossTime = 0;
             }
@@ -232,9 +256,63 @@ namespace LastDayInKhuMuang
                 readyRandPattern = true;
             }
         }
-        public void LightningRod()
+        public void LightningRod(GameTime gameTime)
         {
-                
+            Console.WriteLine("readyRod " + readyRod);
+            Console.WriteLine("usedRod " + usedrod);
+            Console.WriteLine("rodCooldown " + rodCooldown);
+            if (this.playerBox.Intersects(dangArea) && readyRod)
+            {
+                usedrod = true;
+                readyRod = false;
+            }
+
+            if (usedrod)
+            {
+                delayShock += (float)gameTime.ElapsedGameTime.Milliseconds / 1000;
+                if (delayShock >= 2.5)
+                {
+                    shockEffect += (float)gameTime.ElapsedGameTime.Milliseconds / 1000;
+                    for (int i = 0; i < dataRod.Length; i++)
+                    {
+                        dataRod[i] = Color.Red;
+                    }
+                    damageLightningRod.SetData(dataRod);
+                }
+                if (shockEffect >= 6)
+                {
+                    usedrod = false;
+                }
+            }
+            else if (!usedrod)
+            {
+                delayShock = 0;
+                shockEffect = 0;                
+                for (int i = 0; i < dataRod.Length; i++)
+                {
+                    dataRod[i] = Color.LightPink;
+                }
+                damageLightningRod.SetData(dataRod);
+            }
+
+            if (!usedrod && !readyRod)
+            {
+                rodCooldown += (float)gameTime.ElapsedGameTime.Milliseconds / 1000;
+                if (rodCooldown >= 5)
+                {
+                    readyRod = true;
+                    rodCooldown = 0;
+                }
+            }
+            //test skill
+            //if (ks.IsKeyDown(Keys.NumPad3))
+            //{
+            //    usedrod = true;
+            //}
+            //else if (ks.IsKeyUp(Keys.NumPad3))
+            //{
+            //    usedrod = false;
+            //}                          
         }
     }
 }
