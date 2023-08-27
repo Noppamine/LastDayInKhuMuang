@@ -62,6 +62,14 @@ namespace LastDayInKhuMuang
         private float delayShock;
         private float shockEffect;
         private float rodCooldown;
+        //Animate
+        static AnimatedTexture rodAnimate;
+        private const float rodRotation = 0;
+        private const float rodScale = 1.0f;
+        private const float rodDepth = 0.5f;
+        private const int rodFrames = 1;
+        private const int rodFramesPerSec = 6;
+        private const int rodFramesRow = 8;
 
         private float elapsed;
         private float bossTime;
@@ -98,6 +106,7 @@ namespace LastDayInKhuMuang
         {
            // boltAnimate = new AnimatedTexture(Vector2.Zero, boltRotation, boltScale, boltDepth);
             beamAnimate = new AnimatedTexture(Vector2.Zero, beamRotation, beamScale, beamDepth);
+            rodAnimate = new AnimatedTexture(Vector2.Zero, rodRotation, rodScale, rodDepth);
         }
         public void BossLoad(Game1 game)
         {
@@ -109,6 +118,7 @@ namespace LastDayInKhuMuang
 
            // boltAnimate.Load(game.Content, "Resources/Boss/Animation-Tunder_Boss", boltFrames, boltFramesRow, boltFramesPerSec);
             beamAnimate.Load(game.Content, "Resources/Boss/ShootLighting_Boss", beamFrames, beamFramesRow, beamFramesPerSec);
+            rodAnimate.Load(game.Content, "ThundeTrap_Boss", rodFrames,rodFramesRow,rodFramesPerSec);
 
             dataBolt = new Color[60*60];
             dataBeam = new Color[1690*60];
@@ -169,7 +179,7 @@ namespace LastDayInKhuMuang
             ks = Keyboard.GetState();
             ThunderBolt(gameTime);
             LightningBeam(gameTime, bossAnimate);
-            LightningRod(gameTime);
+            LightningRod(gameTime,spriteBatch ,rodAnimate);
         }
 
         public void BossDraw(SpriteBatch spriteBatch, AnimatedTexture boss2Aniamte)
@@ -177,6 +187,11 @@ namespace LastDayInKhuMuang
             if (usedrod)
             {
                 spriteBatch.Draw(damageLightningRod, lightningRod, Color.White);
+                if (delayShock >= 2.5)
+                {
+                    rodAnimate.DrawFrame(spriteBatch, lightningRod);
+                    rodAnimate.UpdateFrame(elapsed);
+                }
             }
             if (usedThunderBolt && thunderBoltPos.Y <= playerPos.Y)
             {
@@ -341,7 +356,7 @@ namespace LastDayInKhuMuang
                 beamAnimate.frame_r = 0;
             }
         }
-        public void LightningRod(GameTime gameTime)
+        public void LightningRod(GameTime gameTime , SpriteBatch spriteBatch ,AnimatedTexture rodAnimate)
         {           
             if (this.playerBox.Intersects(dangArea) && readyRod)
             {
@@ -357,7 +372,7 @@ namespace LastDayInKhuMuang
                     shockEffect += (float)gameTime.ElapsedGameTime.Milliseconds / 1000;
                     for (int i = 0; i < dataRod.Length; i++)
                     {
-                        dataRod[i] = Color.Red;
+                        dataRod[i] = Color.White;
                     }
                     damageLightningRod.SetData(dataRod);
                 }
