@@ -6,6 +6,7 @@ using MonoGame.Extended.ViewportAdapters;
 using MonoGame.Extended;
 using MonoGame.Extended.Screens;
 using MonoGame.Extended.Collisions;
+using MonoGame.Extended.Content;
 using System.Collections.Generic;
 
 namespace LastDayInKhuMuang
@@ -16,22 +17,21 @@ namespace LastDayInKhuMuang
         private SpriteBatch _spriteBatch;
 
         //SetMapsize
-        const int MapWidth = 1600;
-        const int MapHeight = 900;
-
-        //Scenes
-        public FrontHomeScene mFrontHomeScene;
-        public Scenes mCurrentScene;
+        public const int MapWidth = 3200;
+        public const int MapHeight = 1800;        
+        
+        
 
         //Scense
         private Texture2D homeScenes;
         private SimpleChangeScenes changeScenes;
+        
 
         ////Camera
-        public static OrthographicCamera camera;
-        public static Vector2 cameraPos;
-        public static Vector2 bgPos;
-        private int zoom = 2;
+        //public static OrthographicCamera camera;
+        //public static Vector2 cameraPos;
+        //public static Vector2 bgPos;
+        //private int zoom = 2;
 
         //Input
         private KeyboardState ks;
@@ -55,42 +55,6 @@ namespace LastDayInKhuMuang
         private Vector2 skillspeed = new Vector2(1, 1);
         Rectangle skillBox = new Rectangle();
         private string SkillDirection;
-
-        //PlayerAnimation
-        private AnimatedTexture playerAnimate;
-        private const float Rotation = 0;
-        private const float Scale = 1.0f;
-        private const float Depth = 0.5f;
-        private const int Frames = 10;
-        private const int FramesPerSec = 12;
-        private const int FramesRow = 8;
-
-        //AttackAnimation
-        private AnimatedTexture AttackAnimate;
-        private const float AttackRotation = 0;
-        private const float AttackScale = 1.0f;
-        private const float AttackDepth = 0.5f;
-        private const int AttackFrames = 10;
-        private const int AttackFramesPerSec = 12;
-        private const int AttackFramesRow = 2;
-
-        //SkillAnimation
-        private AnimatedTexture SkillAnimate;
-        private const float SkillRotation = 0;
-        private const float SkillScale = 1.0f;
-        private const float SkillDepth = 0.5f;
-        private const int SkillFrames = 4;
-        private const int SkillFramesPerSec = 6;
-        private const int SkillFramesRow = 4;
-
-        //BossAnimation
-        private AnimatedTexture boss2Animate;
-        private const float boss2Rotation = 0;
-        private const float boss2Scale = 1.0f;
-        private const float boss2Depth = 0.5f;
-        private const int boss2Frames = 4;
-        private const int boss2FramesPerSec = 5;
-        private const int boss2FramesRow = 2;
 
         //Enemy
         private Texture2D ball;
@@ -120,11 +84,9 @@ namespace LastDayInKhuMuang
             //collisionComponent = new CollisionComponent(new RectangleF(200, 200, MapWidth, MapHeight));
 
             //Set Sprite
-            playerAnimate = new AnimatedTexture(Vector2.Zero, Rotation, Scale, Depth);
-            AttackAnimate = new AnimatedTexture(Vector2.Zero, AttackRotation,AttackScale,AttackDepth);
-            SkillAnimate = new AnimatedTexture(Vector2.Zero,SkillRotation,SkillScale,SkillDepth);
-            boss2Animate = new AnimatedTexture(Vector2.Zero, boss2Rotation, boss2Scale, boss2Depth);
 
+
+            Player.Initialize();
             Bosstwo.Initialization();
         }
 
@@ -135,9 +97,9 @@ namespace LastDayInKhuMuang
             _graphics.ApplyChanges();
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
-            ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth/zoom, MapHeight/zoom);
-            camera = new OrthographicCamera(viewportadpter);
-            bgPos = new Vector2(0, 0);
+            //ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth/zoom, MapHeight/zoom);
+            //camera = new OrthographicCamera(viewportadpter);
+            //bgPos = new Vector2(0, 0);
             
             //bgPos = new Vector2(0, 0);
             base.Initialize();
@@ -149,12 +111,9 @@ namespace LastDayInKhuMuang
 
             //Load Player Content
             player = new Player(speed, boostSpeed, hp, stamina, playerPos, skillPos);
-            playerAnimate.Load(Content, "Player_all_set", Frames, FramesRow, FramesPerSec);
-            AttackAnimate.Load(Content, "Effect_Attack", AttackFrames, AttackFramesRow, AttackFramesPerSec);
-            SkillAnimate.Load(Content,"set-Skill-E",SkillFrames,SkillFramesRow,SkillFramesPerSec);
-            boss2Animate.Load(Content, "BossTuderbolt", boss2Frames, boss2FramesRow, boss2FramesPerSec);
-            
+            player.Load(this);            
             player.SetAction(1);
+
             //Setup player
             //entities.Add(new PlayerEntity(this, new RectangleF(new Point2(32, 470), new Size2(56, 56))));
             //foreach (IEntity entity in entities)
@@ -196,7 +155,7 @@ namespace LastDayInKhuMuang
             //    entity.Update(gameTime);
             //}
             //collisionComponent.Update(gameTime);
-            player.PlayerMove(ks, _graphics, playerAnimate,AttackAnimate, SkillAnimate,gameTime);
+            player.PlayerMove(ks, _graphics,gameTime, skillPos);
             playerPos = player.GetPlayerPos();
             //player Hitbox
             playerBox = new Rectangle((int)playerPos.X + 40,(int)playerPos.Y + 80,48,48);
@@ -225,25 +184,16 @@ namespace LastDayInKhuMuang
             //skill hitbox
             skillBox = new Rectangle((int)skillPos.X, (int)skillPos.Y, 128, 128);
 
-            //Camera
-            if (ks.IsKeyDown(Keys.F11) && _graphics.IsFullScreen == false)
-            {
-                _graphics.IsFullScreen = true;                
-            }
-            else if (ks.IsKeyDown(Keys.F11) && _graphics.IsFullScreen == true)
-            {
-                _graphics.IsFullScreen = false;
-            }
+            //Camera           
             if (changeScenes.GetScenes() == 1)
             {
                 if (changeScenes.GetChangedScene())
                 {
                     player.SetPosition(changeScenes.GetPlayerSpawn());
                 }
-                ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth / zoom, MapHeight / zoom);
-                camera = new OrthographicCamera(viewportadpter);               
-                camera.LookAt(cameraPos);
-                UpdateCamera();
+                //ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth / zoom, MapHeight / zoom);
+                //camera = new OrthographicCamera(viewportadpter);               
+                //camera.LookAt(cameraPos);
             }
             else if (changeScenes.GetScenes() == 2)
             {
@@ -251,15 +201,14 @@ namespace LastDayInKhuMuang
                 {
                     player.SetPosition(changeScenes.GetPlayerSpawn());
                 }
-                boss2.BossUpdate(player.GetPlayerPos(), gameTime, playerBox, boss2Animate);                
+                boss2.BossUpdate(player.GetPlayerPos(), gameTime, playerBox);
                 //player.SetPosition(new Vector2(200,200));
-                ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth, MapHeight);
-                camera = new OrthographicCamera(viewportadpter);
-                camera.LookAt(bgPos + new Vector2(MapWidth / 2, MapHeight / 2));
+                //ViewportAdapter viewportadpter = new BoxingViewportAdapter(Window, GraphicsDevice, MapWidth, MapHeight);
+                //camera = new OrthographicCamera(viewportadpter);
                 //camera.LookAt(bgPos + new Vector2(MapWidth / 2, MapHeight / 2));
-                UpdateCamera();
+                //camera.LookAt(bgPos + new Vector2(MapWidth / 2, MapHeight / 2));
             }
-            
+
 
             //Scenes Update
             changeScenes.UpdateScenes(ks);
@@ -289,8 +238,8 @@ namespace LastDayInKhuMuang
             }
 
             //Draw begin here
-            var transformMatrix = camera.GetViewMatrix();
-            _spriteBatch.Begin(transformMatrix: transformMatrix);
+            //var transformMatrix = camera.GetViewMatrix();
+            _spriteBatch.Begin();
             changeScenes.DrawScenes();
             //_spriteBatch.Draw(homeScenes, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, new Vector2(2.5f, 2.5f), 0, 0);
             //foreach (IEntity entity in entities)
@@ -305,133 +254,15 @@ namespace LastDayInKhuMuang
             }
             else if (changeScenes.GetScenes() == 2)
             {
-                boss2.BossDraw(_spriteBatch, boss2Animate);
+                boss2.BossDraw(_spriteBatch);
             }
 
-            //Draw Player            
-            if (!player.GetIdle())
-            {               
-                playerAnimate.DrawFrame(_spriteBatch, playerPos, player.GetAction());                
-            }
-            else if (player.GetIdle())
-            {
-                if (player.GetPlayerAttack() && player.GetDirection() == "Right") // right attack animate
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
-                }
-                else if (player.GetPlayerAttack() && player.GetDirection() == "Left") // left attack animate
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 4);
-                }
-                else if (player.GetPlayerAttack() && player.GetDirection() == "Up") // up attack animate
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
-                }
-                else if (player.GetPlayerAttack() && player.GetDirection() == "Down") // down attack animate
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
-                }
-                else if (player.GetPlayerSkill() && player.GetSkillDirection() == "Left") // left skill attack animate
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 4);
-                }
-                else if (player.GetPlayerSkill() && player.GetSkillDirection() == "Right") // right skill attack animate
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
-                }
-                else if (player.GetPlayerSkill() && player.GetSkillDirection() == "Up") // up skill attack animate
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
-                }
-                else if (player.GetPlayerSkill() && player.GetSkillDirection() == "Down") // down skill attack animate
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
-                }
-                else if (player.GetDirection() == "Left" && ks.IsKeyUp(Keys.D))
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 8 );
-                }
-                else if (player.GetDirection() == "Right" && ks.IsKeyUp(Keys.A))
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 7);
-                }
-                else
-                {
-                    playerAnimate.DrawFrame(_spriteBatch, playerPos, 7);
-                }
-            }
-
-
-            //Draw Skill
-            if (player.GetSkillTime())
-            {
-                if (skillPos.X > 0 && skillPos.X < _graphics.GraphicsDevice.Viewport.Width && skillPos.Y > 0 && skillPos.Y < _graphics.GraphicsDevice.Viewport.Width)
-                {
-                    //_spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y), skillBox, Color.White);
-                    //_spriteBatch.Draw(ball, new Vector2(skillPos.X, skillPos.Y), new Rectangle(0, 0, 24, 24), Color.White);
-
-                    if (player.GetSkillDirection() == "Right") // right skill
-                    {
-                        SkillAnimate.DrawFrame(_spriteBatch, new Vector2(skillPos.X, skillPos.Y), 1);
-                        if(SkillAnimate.IsEnd)
-                        {
-                            SkillAnimate.DrawFrame(_spriteBatch, 4, new Vector2(skillPos.X, skillPos.Y), 1);
-                            SkillAnimate.Pause(4,1);
-                        }
-                        else
-                        {
-                            SkillAnimate.DrawFrame(_spriteBatch, new Vector2(skillPos.X, skillPos.Y), 1);
-                        }
-                    }
-                    if (player.GetSkillDirection() == "Left" ) // left skill
-                    {
-                        SkillAnimate.DrawFrame(_spriteBatch, new Vector2(skillPos.X, skillPos.Y), 2);
-                    }
-                    if (player.GetSkillDirection() == "Up") // up skill
-                    {
-                        SkillAnimate.DrawFrame(_spriteBatch, new Vector2(skillPos.X, skillPos.Y), 3);
-                    }
-                    if (player.GetSkillDirection() == "Down") // down skill
-                    {
-                        SkillAnimate.DrawFrame(_spriteBatch, new Vector2(skillPos.X, skillPos.Y), 4);
-                    }
-                }
-            }
-
-            //Draw AttackAnimate
-            if (player.GetPlayerAttack()&& player.GetDirection() == "Right") // right attack
-            {
-                playerAnimate.DrawFrame(_spriteBatch, playerPos,3);
-                AttackAnimate.DrawFrame(_spriteBatch,playerPos,1);
-            }
-            if (player.GetPlayerAttack() && player.GetDirection() == "Left") // left attack
-            {
-                playerAnimate.DrawFrame(_spriteBatch, playerPos, 4);
-                AttackAnimate.DrawFrame(_spriteBatch, playerPos, 2);
-            }
-            if (player.GetPlayerAttack() && player.GetDirection() == "Up") // up attack
-            {
-                playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
-                AttackAnimate.DrawFrame(_spriteBatch, playerPos, 1);
-            }
-            if (player.GetPlayerAttack() && player.GetDirection() == "Down") // down attack
-            {
-                playerAnimate.DrawFrame(_spriteBatch, playerPos, 3);
-                AttackAnimate.DrawFrame(_spriteBatch, playerPos, 1);
-            }
-
-            
-            
-
+            player.Draw(_spriteBatch, _graphics);
             _spriteBatch.End();
 
             base.Draw(gameTime);
         }
 
-        public void UpdateCamera()
-        {
-            cameraPos = player.GetPlayerPos() + new Vector2(64, 64);
-        }
         public int GetMapWidth()
         {
             return MapWidth;

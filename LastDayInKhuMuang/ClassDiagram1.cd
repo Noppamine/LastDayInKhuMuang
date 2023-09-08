@@ -3,21 +3,29 @@
   <Class Name="LastDayInKhuMuang.AnimatedTexture" Collapsed="true">
     <Position X="1.5" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>gAKggAABAAAABIEAAQMAEIAAAAhABAAg4AAgAEkAAgE=</HashCode>
+      <HashCode>gAKggAABAAAABMEAAQMAEIAAAAhABAAg4AAgAEkAAgE=</HashCode>
       <FileName>AnimatedTexture.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="LastDayInKhuMuang.BossOne" Collapsed="true">
-    <Position X="5" Y="2.5" Width="1.5" />
+  <Class Name="LastDayInKhuMuang.BossOne">
+    <Position X="5" Y="1.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAAAAIAAAAAICIAAAAAAAAAAAAAAAAAAAABAIAAIACA=</HashCode>
       <FileName>BossOne.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="LastDayInKhuMuang.Bosstwo" Collapsed="true">
-    <Position X="5" Y="3.25" Width="1.5" />
+  <Class Name="LastDayInKhuMuang.Bosstwo">
+    <Position X="3.25" Y="3.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>FAQZAsAAAABYCMIBdFaCZAINAGBqhAAJGQCQdFzoQeg=</HashCode>
       <FileName>Bosstwo.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -28,19 +36,27 @@
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AIQAhAAARgAAA4AAAAoAAAAAAQCIEUArEMDAIICIGBU=</HashCode>
+      <HashCode>AIQAhAQQRgAAAwgAAIgAEBAAAQCIAUALEMTCIACYEBQ=</HashCode>
       <FileName>Game1.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="LastDayInKhuMuang.Player" Collapsed="true">
-    <Position X="5" Y="1.75" Width="1.5" />
+  <Class Name="LastDayInKhuMuang.Player">
+    <Position X="6.75" Y="1.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>EIAABQAAhADCQCkEBCRgRAAAAFAAAUCARGTAYgQYBAA=</HashCode>
+      <HashCode>EIQAhQQABADKQ60sBq5hVAAABFAAE0CgRGTAYowYTSU=</HashCode>
       <FileName>Player.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LastDayInKhuMuang.Scenes">
     <Position X="1.5" Y="1.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAQAAQAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Scenes.cs</FileName>
@@ -48,6 +64,10 @@
   </Class>
   <Class Name="LastDayInKhuMuang.FrontHomeScene">
     <Position X="1.5" Y="4.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAgAAAAAAAAQAAAAAAAAJAAAAAAAAAAA=</HashCode>
       <FileName>FrontHomeScene.cs</FileName>

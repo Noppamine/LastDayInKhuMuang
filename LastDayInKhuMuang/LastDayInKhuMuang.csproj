@@ -12,12 +12,13 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Extended" Version="3.8.0" />
+    <PackageReference Include="MonoGame.Extended" Version="3.9.0-alpha0105" />
+    <PackageReference Include="MonoGame.Extended.Animations" Version="3.7.0" />
     <PackageReference Include="MonoGame.Extended.Collisions" Version="3.8.0" />
-    <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="3.8.0" />
-    <PackageReference Include="MonoGame.Extended.Tiled" Version="3.8.0" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.303" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
+	<PackageReference Include="MonoGame.Extended.Tiled" Version="3.9.0-alpha0105" />
+	<PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="3.9.0-alpha0105" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\Resources\" />

@@ -26,6 +26,7 @@ namespace LastDayInKhuMuang
             this.game = game;
             this.spriteBatch = spriteBatch;
             changed = false;
+            scenes = 1;
         }
         public void UpdateScenes(KeyboardState ks)
         {
@@ -57,7 +58,7 @@ namespace LastDayInKhuMuang
         {
             if (scenes == 1)
             {
-                spriteBatch.Draw(homeScene, pos, null, Color.White, 0f, Vector2.Zero, new Vector2(2.5f, 2.5f), 0, 0);                
+                spriteBatch.Draw(homeScene, pos, null, Color.White, 0f, Vector2.Zero, new Vector2(2f, 2f), 0, 0);                
             }
             else if (scenes == 2)
             {

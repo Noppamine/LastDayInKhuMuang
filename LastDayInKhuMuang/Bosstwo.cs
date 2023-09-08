@@ -15,6 +15,16 @@ namespace LastDayInKhuMuang
 {
     public class Bosstwo
     {
+
+        //BossAnimation
+        static AnimatedTexture boss2Animate;
+        private const float boss2Rotation = 0;
+        private const float boss2Scale = 1.0f;
+        private const float boss2Depth = 0.5f;
+        private const int boss2Frames = 4;
+        private const int boss2FramesPerSec = 5;
+        private const int boss2FramesRow = 2;
+
         //For Test
         KeyboardState ks;
         private bool usedThunderBolt;
@@ -110,19 +120,20 @@ namespace LastDayInKhuMuang
             boltAnimate = new AnimatedTexture(Vector2.Zero, boltRotation, boltScale, boltDepth);
             beamAnimate = new AnimatedTexture(Vector2.Zero, beamRotation, beamScale, beamDepth);
             rodAnimate = new AnimatedTexture(Vector2.Zero, rodRotation, rodScale, rodDepth);
+            boss2Animate = new AnimatedTexture(Vector2.Zero, boss2Rotation, boss2Scale, boss2Depth);
         }
         public void BossLoad(Game1 game)
         {
+            boss2Animate.Load(game.Content, "Resources/Boss/BossTuderbolt", boss2Frames, boss2FramesRow, boss2FramesPerSec);
+            boltAnimate.Load(game.Content, "Resources/Boss/Animation-ThunderBolt_boss_", boltFrames, boltFramesRow, boltFramesPerSec);
+            beamAnimate.Load(game.Content, "Resources/Boss/ShootLighting_Boss", beamFrames, beamFramesRow, beamFramesPerSec);
+            rodAnimate.Load(game.Content, "Resources/Boss/ThundeTrap_Boss", rodFrames, rodFramesRow, rodFramesPerSec);
             boss2Texture = game.Content.Load<Texture2D>("Resources/Boss/Boss-Attack-TunderBold-Access");
             thunderBolt = game.Content.Load<Texture2D>("Resources/ball");
             damageThunderboltArea = new Texture2D(game.GraphicsDevice, 900, 60);
             damageLightningBeamArea = new Texture2D(game.GraphicsDevice, 1690, 60);
             damageLightningRod = new Texture2D(game.GraphicsDevice, 768, 768/2);
-
-            boltAnimate.Load(game.Content, "Resources/Boss/Animation-ThunderBolt_boss_", boltFrames, boltFramesRow, boltFramesPerSec);
-            beamAnimate.Load(game.Content, "Resources/Boss/ShootLighting_Boss", beamFrames, beamFramesRow, beamFramesPerSec);
-            rodAnimate.Load(game.Content, "ThundeTrap_Boss", rodFrames,rodFramesRow,rodFramesPerSec);
-
+            
             dataBolt = new Color[900*60];
             dataBeam = new Color[1690*60];
             dataRod = new Color[(768) * (768 / 2)];
@@ -148,13 +159,13 @@ namespace LastDayInKhuMuang
             damageLightningBeamArea.SetData(dataBeam);
             damageLightningRod.SetData(dataRod);
         }
-        public void BossUpdate(Vector2 playerPos, GameTime gameTime, Rectangle playerBox, AnimatedTexture bossAnimate)
+        public void BossUpdate(Vector2 playerPos, GameTime gameTime, Rectangle playerBox)
         {
-            bossAnimate.UpdateFrame(elapsed);
+            boss2Animate.UpdateFrame(elapsed);
             this.playerBox = playerBox;
             lightningRod = new Vector2(bossPos.X, bossPos.Y + (768/2) /*bossPos.Y + (boss2Texture.Height / 2)*/);
             dangArea = new Rectangle((int)bossPos.X, (int)bossPos.Y + (boss2Texture.Height / 2), boss2Texture.Width, boss2Texture.Height);
-            AttackPattern(gameTime, bossAnimate);                        
+            AttackPattern(gameTime, boss2Animate);                        
             if (!usedLightningBeam && !usedThunderBolt)
             {
                 this.playerPos = new Vector2(playerBox.X, playerBox.Y);
@@ -180,12 +191,12 @@ namespace LastDayInKhuMuang
                 thunderBoltPos.Y = (this.playerPos.Y - thunderBoltHeight) + 24; //changing
             }
             ks = Keyboard.GetState();
-            ThunderBolt(gameTime, bossAnimate);
-            LightningBeam(gameTime, bossAnimate);
+            ThunderBolt(gameTime, boss2Animate);
+            LightningBeam(gameTime, boss2Animate);
             LightningRod(gameTime,spriteBatch ,rodAnimate);
         }
 
-        public void BossDraw(SpriteBatch spriteBatch, AnimatedTexture boss2Animate)
+        public void BossDraw(SpriteBatch spriteBatch)
         {
             if (usedrod)
             {
@@ -249,8 +260,8 @@ namespace LastDayInKhuMuang
                 int action;
                 if (bossTime > 2 )
                 {
-                    //action = rand.Next(0, 3);
-                    action = 2;
+                    action = rand.Next(0, 3);
+                    //action = 2;
                     switch (action)
                     {
                         case 1:
@@ -273,7 +284,7 @@ namespace LastDayInKhuMuang
             //    bossTime = 0;
             //}            
         }
-        public async void ThunderBolt(GameTime time, AnimatedTexture bossAnimate)
+        public void ThunderBolt(GameTime time, AnimatedTexture bossAnimate)
         {
             if (usedThunderBolt)
             {

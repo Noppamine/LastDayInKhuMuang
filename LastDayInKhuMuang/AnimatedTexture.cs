@@ -213,10 +213,7 @@ namespace LastDayInKhuMuang
         public void Pause(int frame,int row)
         {
             this.pauseFrame = frame;
-            this.pauseRow = row;
-            
-                
-            
+            this.pauseRow = row;  
         }
 
     }
